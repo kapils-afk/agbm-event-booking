@@ -8,6 +8,7 @@ export interface Booking {
   proofIdType: "Aadhaar" | "PAN" | "Driving License";
   proofIdNumber: string;
   advancePayment?: number;
+  tariffAmount?: number;
   functionType: string;
   purposeDescription?: string;
   fromDateTime: string;
