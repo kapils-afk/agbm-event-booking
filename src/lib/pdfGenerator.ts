@@ -21,9 +21,7 @@ export function generateBookingPDF(booking: Booking) {
   };
 
   // Header
-  addText("RADHEYKRISHNA PREM SANSTHA", w / 2, y, { size: 14, bold: true, align: "center" });
-  y += 6;
-  addText("(Adi Goud Brahmin Mahashaba Charitable Trust)", w / 2, y, { size: 9, align: "center" });
+  addText("ADI GOUD BRAHMIN MAHASHABA CHARITABLE TRUST", w / 2, y, { size: 14, bold: true, align: "center" });
   y += 5;
   addText("No. 417, Vegetarian Village, Puzhal, Chennai - 600 066", w / 2, y, { size: 9, align: "center" });
   y += 5;
