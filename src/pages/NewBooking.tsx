@@ -32,6 +32,10 @@ function getProofIdPlaceholder(type: string) {
   return "Select ID type first";
 }
 
+function combineDateTime(date: string, time: string) {
+  return date && time ? `${date}T${time}` : "";
+}
+
 export default function NewBooking() {
   const navigate = useNavigate();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -39,17 +43,23 @@ export default function NewBooking() {
     name: "", address: "", occupation: "", phone: "", alternatePhone: "",
     proofIdType: "" as string, proofIdNumber: "", advancePayment: "", tariffAmount: "",
     functionType: "", purposeDescription: "",
-    fromDateTime: "", toDateTime: "", allottedSlot: "" as string, hallType: "" as string,
+    fromDate: "", fromTime: "", toDate: "", toTime: "", allottedSlot: "" as string, hallType: "" as string,
     utilityCharges: "", receiptNumber: "", bookingDate: "",
     termsAccepted: false, signature: "", functionName: "",
   });
 
-  const set = (key: string, value: string | boolean) => {
+  const set = (key: string, value: string | boolean, errorKeys: string[] = [key]) => {
     setForm((p) => ({ ...p, [key]: value }));
-    setErrors((p) => { const n = { ...p }; delete n[key]; return n; });
+    setErrors((p) => {
+      const n = { ...p };
+      errorKeys.forEach((errorKey) => delete n[errorKey]);
+      return n;
+    });
   };
 
   const validate = () => {
+    const fromDateTime = combineDateTime(form.fromDate, form.fromTime);
+    const toDateTime = combineDateTime(form.toDate, form.toTime);
     const e: Record<string, string> = {};
     if (!form.name.trim()) e.name = "Required";
     if (!form.address.trim()) e.address = "Required";
@@ -60,9 +70,9 @@ export default function NewBooking() {
     if (!form.proofIdNumber) e.proofIdNumber = "Required";
     else if (form.proofIdType && !validateProofId(form.proofIdType, form.proofIdNumber)) e.proofIdNumber = `Invalid ${form.proofIdType} format`;
     if (!form.functionType) e.functionType = "Required";
-    if (!form.fromDateTime) e.fromDateTime = "Required";
-    if (!form.toDateTime) e.toDateTime = "Required";
-    if (form.fromDateTime && form.toDateTime && new Date(form.fromDateTime) >= new Date(form.toDateTime)) e.toDateTime = "Must be after From date";
+    if (!fromDateTime) e.fromDateTime = "Required";
+    if (!toDateTime) e.toDateTime = "Required";
+    if (fromDateTime && toDateTime && new Date(fromDateTime) >= new Date(toDateTime)) e.toDateTime = "Must be after From date";
     if (!form.allottedSlot) e.allottedSlot = "Required";
     if (!form.hallType) e.hallType = "Required";
     if (!form.utilityCharges || Number(form.utilityCharges) <= 0) e.utilityCharges = "Required";
@@ -81,6 +91,9 @@ export default function NewBooking() {
       return;
     }
 
+    const fromDateTime = combineDateTime(form.fromDate, form.fromTime);
+    const toDateTime = combineDateTime(form.toDate, form.toTime);
+
     const booking: Booking = {
       id: generateBookingId(),
       name: form.name, address: form.address, occupation: form.occupation,
@@ -91,7 +104,8 @@ export default function NewBooking() {
       tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
       functionType: form.functionType,
       purposeDescription: form.purposeDescription || undefined,
-      fromDateTime: form.fromDateTime, toDateTime: form.toDateTime,
+      fromDateTime,
+      toDateTime,
       allottedSlot: form.allottedSlot as Booking["allottedSlot"],
       hallType: form.hallType as Booking["hallType"],
       utilityCharges: Number(form.utilityCharges),
@@ -123,6 +137,35 @@ export default function NewBooking() {
         <Input type={type} value={(form as any)[field]} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
       )}
       {errors[field] && <p className="text-xs text-destructive">{errors[field]}</p>}
+    </div>
+  );
+
+  const renderDateTimeField = (
+    label: string,
+    dateField: "fromDate" | "toDate",
+    timeField: "fromTime" | "toTime",
+    errorField: "fromDateTime" | "toDateTime",
+  ) => (
+    <div className="space-y-1.5">
+      <Label className="text-sm font-medium">{label} <span className="text-destructive">*</span></Label>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_148px]">
+        <Input
+          aria-label={`${label} date`}
+          type="date"
+          value={form[dateField]}
+          onChange={(e) => set(dateField, e.target.value, [errorField])}
+          className={errors[errorField] ? "border-destructive" : ""}
+        />
+        <Input
+          aria-label={`${label} time`}
+          type="time"
+          step="60"
+          value={form[timeField]}
+          onChange={(e) => set(timeField, e.target.value, [errorField])}
+          className={errors[errorField] ? "border-destructive" : ""}
+        />
+      </div>
+      {errors[errorField] && <p className="text-xs text-destructive">{errors[errorField]}</p>}
     </div>
   );
 
@@ -175,8 +218,8 @@ export default function NewBooking() {
           <div className="md:col-span-2">
             {renderField("Purpose Description", "purposeDescription", "textarea", false, "Optional description")}
           </div>
-          {renderField("From Date & Time", "fromDateTime", "datetime-local")}
-          {renderField("To Date & Time", "toDateTime", "datetime-local")}
+          {renderDateTimeField("From Date & Time", "fromDate", "fromTime", "fromDateTime")}
+          {renderDateTimeField("To Date & Time", "toDate", "toTime", "toDateTime")}
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">Allotted Slot <span className="text-destructive">*</span></Label>
             <div className="flex gap-4 pt-1">
