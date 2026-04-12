@@ -13,6 +13,18 @@ import { toast } from "sonner";
 
 const proofIdTypes = ["Aadhaar", "PAN", "Driving License"] as const;
 const functionTypes = ["Marriage", "Reception", "Other"];
+const timeOptions = Array.from({ length: 48 }, (_, index) => {
+  const hour = Math.floor(index / 2);
+  const minute = index % 2 === 0 ? "00" : "30";
+  const value = `${hour.toString().padStart(2, "0")}:${minute}`;
+  const displayHour = hour % 12 || 12;
+  const period = hour < 12 ? "AM" : "PM";
+
+  return {
+    value,
+    label: `${displayHour}:${minute} ${period}`,
+  };
+});
 
 function validatePhone(phone: string) {
   return /^\d{10}$/.test(phone.replace(/\s/g, ""));
@@ -154,16 +166,19 @@ export default function NewBooking() {
           type="date"
           value={form[dateField]}
           onChange={(e) => set(dateField, e.target.value, [errorField])}
+          onInput={(e) => set(dateField, (e.target as HTMLInputElement).value, [errorField])}
           className={errors[errorField] ? "border-destructive" : ""}
         />
-        <Input
-          aria-label={`${label} time`}
-          type="time"
-          step="60"
-          value={form[timeField]}
-          onChange={(e) => set(timeField, e.target.value, [errorField])}
-          className={errors[errorField] ? "border-destructive" : ""}
-        />
+        <Select value={form[timeField]} onValueChange={(value) => set(timeField, value, [errorField])}>
+          <SelectTrigger aria-label={`${label} time`} className={errors[errorField] ? "border-destructive" : ""}>
+            <SelectValue placeholder="Select time" />
+          </SelectTrigger>
+          <SelectContent className="max-h-72">
+            {timeOptions.map((time) => (
+              <SelectItem key={time.value} value={time.value}>{time.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       {errors[errorField] && <p className="text-xs text-destructive">{errors[errorField]}</p>}
     </div>
