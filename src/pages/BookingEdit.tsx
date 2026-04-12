@@ -34,6 +34,7 @@ export default function BookingEdit() {
     setForm({
       ...booking,
       advancePayment: booking.advancePayment?.toString() || "",
+      tariffAmount: booking.tariffAmount?.toString() || "",
       utilityCharges: booking.utilityCharges.toString(),
     });
   }, [id]);
@@ -76,6 +77,7 @@ export default function BookingEdit() {
     const booking: Booking = {
       ...form,
       advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined,
+      tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
       utilityCharges: Number(form.utilityCharges),
     };
     const result = updateBooking(booking);
@@ -91,20 +93,19 @@ export default function BookingEdit() {
     const booking: Booking = {
       ...form,
       advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined,
+      tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
       utilityCharges: Number(form.utilityCharges),
     };
     generateBookingPDF(booking);
   };
 
-  const Field = ({ label, field, type = "text", required = true, placeholder = "", children }: any) => (
+  const renderField = (label: string, field: string, type = "text", required = true, placeholder = "") => (
     <div className="space-y-1.5">
       <Label className="text-sm font-medium">{label} {required && <span className="text-destructive">*</span>}</Label>
-      {children || (
-        type === "textarea" ? (
-          <Textarea value={form[field] || ""} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
-        ) : (
-          <Input type={type} value={form[field] || ""} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
-        )
+      {type === "textarea" ? (
+        <Textarea value={form[field] || ""} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
+      ) : (
+        <Input type={type} value={form[field] || ""} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
       )}
       {errors[field] && <p className="text-xs text-destructive">{errors[field]}</p>}
     </div>
@@ -117,36 +118,41 @@ export default function BookingEdit() {
       <Card className="border-none shadow-sm">
         <CardHeader><CardTitle className="text-base">Applicant Details</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Name" field="name" />
-          <Field label="Occupation" field="occupation" />
-          <div className="md:col-span-2"><Field label="Address" field="address" type="textarea" /></div>
-          <Field label="Phone" field="phone" />
-          <Field label="Alternate Phone" field="alternatePhone" required={false} />
-          <Field label="Proof ID Type" field="proofIdType">
+          {renderField("Name", "name")}
+          {renderField("Occupation", "occupation")}
+          <div className="md:col-span-2">{renderField("Address", "address", "textarea")}</div>
+          {renderField("Phone", "phone")}
+          {renderField("Alternate Phone", "alternatePhone", "text", false)}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Proof ID Type <span className="text-destructive">*</span></Label>
             <Select value={form.proofIdType} onValueChange={(v) => { set("proofIdType", v); set("proofIdNumber", ""); }}>
               <SelectTrigger className={errors.proofIdType ? "border-destructive" : ""}><SelectValue /></SelectTrigger>
               <SelectContent>{proofIdTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
-          </Field>
-          <Field label={`${form.proofIdType || "Proof ID"} Number`} field="proofIdNumber" />
-          <Field label="Advance Payment (Rs)" field="advancePayment" type="number" required={false} />
+            {errors.proofIdType && <p className="text-xs text-destructive">{errors.proofIdType}</p>}
+          </div>
+          {renderField(`${form.proofIdType || "Proof ID"} Number`, "proofIdNumber")}
+          {renderField("Tariff Amount (Rs)", "tariffAmount", "number", false)}
+          {renderField("Advance Payment (Rs)", "advancePayment", "number", false)}
         </CardContent>
       </Card>
 
       <Card className="border-none shadow-sm">
         <CardHeader><CardTitle className="text-base">Booking Details</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Function Type" field="functionType">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Function Type <span className="text-destructive">*</span></Label>
             <Select value={form.functionType} onValueChange={(v) => set("functionType", v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{functionTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
-          </Field>
-          <Field label="Function Name" field="functionName" />
-          <div className="md:col-span-2"><Field label="Purpose" field="purposeDescription" type="textarea" required={false} /></div>
-          <Field label="From Date & Time" field="fromDateTime" type="datetime-local" />
-          <Field label="To Date & Time" field="toDateTime" type="datetime-local" />
-          <Field label="Allotted Slot" field="allottedSlot">
+          </div>
+          {renderField("Function Name", "functionName")}
+          <div className="md:col-span-2">{renderField("Purpose", "purposeDescription", "textarea", false)}</div>
+          {renderField("From Date & Time", "fromDateTime", "datetime-local")}
+          {renderField("To Date & Time", "toDateTime", "datetime-local")}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Allotted Slot <span className="text-destructive">*</span></Label>
             <div className="flex gap-4 pt-1">
               {["AM", "PM"].map((s) => (
                 <label key={s} className="flex items-center gap-2 cursor-pointer">
@@ -154,8 +160,10 @@ export default function BookingEdit() {
                 </label>
               ))}
             </div>
-          </Field>
-          <Field label="Hall Type" field="hallType">
+            {errors.allottedSlot && <p className="text-xs text-destructive">{errors.allottedSlot}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Hall Type <span className="text-destructive">*</span></Label>
             <div className="flex gap-4 pt-1">
               {["Single", "Double"].map((h) => (
                 <label key={h} className="flex items-center gap-2 cursor-pointer">
@@ -163,10 +171,11 @@ export default function BookingEdit() {
                 </label>
               ))}
             </div>
-          </Field>
-          <Field label="Utility Charges (Rs)" field="utilityCharges" type="number" />
-          <Field label="Receipt Number" field="receiptNumber" />
-          <Field label="Booking Date" field="bookingDate" type="date" />
+            {errors.hallType && <p className="text-xs text-destructive">{errors.hallType}</p>}
+          </div>
+          {renderField("Utility Charges (Rs)", "utilityCharges", "number")}
+          {renderField("Receipt Number", "receiptNumber")}
+          {renderField("Booking Date", "bookingDate", "date")}
         </CardContent>
       </Card>
 
@@ -177,7 +186,7 @@ export default function BookingEdit() {
             <Checkbox checked={form.termsAccepted} onCheckedChange={(v) => set("termsAccepted", !!v)} id="terms" />
             <Label htmlFor="terms" className="text-sm cursor-pointer">I accept the Terms & Conditions</Label>
           </div>
-          <Field label="Digital Signature" field="signature" />
+          {renderField("Digital Signature", "signature")}
         </CardContent>
       </Card>
 

@@ -37,7 +37,7 @@ export default function NewBooking() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     name: "", address: "", occupation: "", phone: "", alternatePhone: "",
-    proofIdType: "" as string, proofIdNumber: "", advancePayment: "",
+    proofIdType: "" as string, proofIdNumber: "", advancePayment: "", tariffAmount: "",
     functionType: "", purposeDescription: "",
     fromDateTime: "", toDateTime: "", allottedSlot: "" as string, hallType: "" as string,
     utilityCharges: "", receiptNumber: "", bookingDate: "",
@@ -88,6 +88,7 @@ export default function NewBooking() {
       proofIdType: form.proofIdType as Booking["proofIdType"],
       proofIdNumber: form.proofIdNumber,
       advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined,
+      tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
       functionType: form.functionType,
       purposeDescription: form.purposeDescription || undefined,
       fromDateTime: form.fromDateTime, toDateTime: form.toDateTime,
@@ -113,15 +114,13 @@ export default function NewBooking() {
     navigate("/bookings");
   };
 
-  const Field = ({ label, field, type = "text", required = true, placeholder = "", children }: { label: string; field: string; type?: string; required?: boolean; placeholder?: string; children?: React.ReactNode }) => (
+  const renderField = (label: string, field: string, type = "text", required = true, placeholder = "") => (
     <div className="space-y-1.5">
       <Label className="text-sm font-medium">{label} {required && <span className="text-destructive">*</span>}</Label>
-      {children || (
-        type === "textarea" ? (
-          <Textarea value={(form as any)[field]} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
-        ) : (
-          <Input type={type} value={(form as any)[field]} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
-        )
+      {type === "textarea" ? (
+        <Textarea value={(form as any)[field]} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
+      ) : (
+        <Input type={type} value={(form as any)[field]} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
       )}
       {errors[field] && <p className="text-xs text-destructive">{errors[field]}</p>}
     </div>
@@ -135,23 +134,26 @@ export default function NewBooking() {
       <Card className="border-none shadow-sm">
         <CardHeader><CardTitle className="text-base">Section A — Applicant Details</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Name" field="name" placeholder="Full name" />
-          <Field label="Occupation" field="occupation" placeholder="Occupation" />
+          {renderField("Name", "name", "text", true, "Full name")}
+          {renderField("Occupation", "occupation", "text", true, "Occupation")}
           <div className="md:col-span-2">
-            <Field label="Address" field="address" type="textarea" placeholder="Full address" />
+            {renderField("Address", "address", "textarea", true, "Full address")}
           </div>
-          <Field label="Phone / Mobile" field="phone" placeholder="10-digit number" />
-          <Field label="Alternate Phone" field="alternatePhone" required={false} placeholder="Optional" />
-          <Field label="Proof ID Type" field="proofIdType">
+          {renderField("Phone / Mobile", "phone", "text", true, "10-digit number")}
+          {renderField("Alternate Phone", "alternatePhone", "text", false, "Optional")}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Proof ID Type <span className="text-destructive">*</span></Label>
             <Select value={form.proofIdType} onValueChange={(v) => { set("proofIdType", v); set("proofIdNumber", ""); }}>
               <SelectTrigger className={errors.proofIdType ? "border-destructive" : ""}><SelectValue placeholder="Select ID type" /></SelectTrigger>
               <SelectContent>
                 {proofIdTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
               </SelectContent>
             </Select>
-          </Field>
-          <Field label={form.proofIdType ? `${form.proofIdType} Number` : "Proof ID Number"} field="proofIdNumber" placeholder={getProofIdPlaceholder(form.proofIdType)} />
-          <Field label="Advance Payment (Rs)" field="advancePayment" type="number" required={false} placeholder="Optional" />
+            {errors.proofIdType && <p className="text-xs text-destructive">{errors.proofIdType}</p>}
+          </div>
+          {renderField(form.proofIdType ? `${form.proofIdType} Number` : "Proof ID Number", "proofIdNumber", "text", true, getProofIdPlaceholder(form.proofIdType))}
+          {renderField("Tariff Amount (Rs)", "tariffAmount", "number", false, "Optional")}
+          {renderField("Advance Payment (Rs)", "advancePayment", "number", false, "Optional")}
         </CardContent>
       </Card>
 
@@ -159,21 +161,24 @@ export default function NewBooking() {
       <Card className="border-none shadow-sm">
         <CardHeader><CardTitle className="text-base">Section B — Booking Details</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Function Type" field="functionType">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Function Type <span className="text-destructive">*</span></Label>
             <Select value={form.functionType} onValueChange={(v) => set("functionType", v)}>
               <SelectTrigger className={errors.functionType ? "border-destructive" : ""}><SelectValue placeholder="Select type" /></SelectTrigger>
               <SelectContent>
                 {functionTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
               </SelectContent>
             </Select>
-          </Field>
-          <Field label="Function Name" field="functionName" placeholder="e.g., Kumar Wedding" />
-          <div className="md:col-span-2">
-            <Field label="Purpose Description" field="purposeDescription" type="textarea" required={false} placeholder="Optional description" />
+            {errors.functionType && <p className="text-xs text-destructive">{errors.functionType}</p>}
           </div>
-          <Field label="From Date & Time" field="fromDateTime" type="datetime-local" />
-          <Field label="To Date & Time" field="toDateTime" type="datetime-local" />
-          <Field label="Allotted Slot" field="allottedSlot">
+          {renderField("Function Name", "functionName", "text", true, "e.g., Kumar Wedding")}
+          <div className="md:col-span-2">
+            {renderField("Purpose Description", "purposeDescription", "textarea", false, "Optional description")}
+          </div>
+          {renderField("From Date & Time", "fromDateTime", "datetime-local")}
+          {renderField("To Date & Time", "toDateTime", "datetime-local")}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Allotted Slot <span className="text-destructive">*</span></Label>
             <div className="flex gap-4 pt-1">
               {["AM", "PM"].map((s) => (
                 <label key={s} className="flex items-center gap-2 cursor-pointer">
@@ -183,8 +188,9 @@ export default function NewBooking() {
               ))}
             </div>
             {errors.allottedSlot && <p className="text-xs text-destructive">{errors.allottedSlot}</p>}
-          </Field>
-          <Field label="Hall Type" field="hallType">
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Hall Type <span className="text-destructive">*</span></Label>
             <div className="flex gap-4 pt-1">
               {["Single", "Double"].map((h) => (
                 <label key={h} className="flex items-center gap-2 cursor-pointer">
@@ -194,10 +200,10 @@ export default function NewBooking() {
               ))}
             </div>
             {errors.hallType && <p className="text-xs text-destructive">{errors.hallType}</p>}
-          </Field>
-          <Field label="Utility Charges (Rs)" field="utilityCharges" type="number" placeholder="Amount" />
-          <Field label="Receipt Number" field="receiptNumber" placeholder="Receipt #" />
-          <Field label="Booking Date" field="bookingDate" type="date" />
+          </div>
+          {renderField("Utility Charges (Rs)", "utilityCharges", "number", true, "Amount")}
+          {renderField("Receipt Number", "receiptNumber", "text", true, "Receipt #")}
+          {renderField("Booking Date", "bookingDate", "date")}
         </CardContent>
       </Card>
 
@@ -234,7 +240,7 @@ export default function NewBooking() {
             <Label htmlFor="terms" className="text-sm cursor-pointer">I accept the Terms & Conditions</Label>
           </div>
           {errors.termsAccepted && <p className="text-xs text-destructive">{errors.termsAccepted}</p>}
-          <Field label="Digital Signature (Type your name)" field="signature" placeholder="Your full name as signature" />
+          {renderField("Digital Signature (Type your name)", "signature", "text", true, "Your full name as signature")}
         </CardContent>
       </Card>
 
