@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter } from "lucide-react";
+import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import MemberLoginDialog from "@/components/MemberLoginDialog";
 
 interface SiteStats {
   activeMembers: number;
@@ -17,8 +18,8 @@ const defaultStats: SiteStats = {
 
 export default function HomePage() {
   const [stats, setStats] = useState<SiteStats>(defaultStats);
+  const [loginOpen, setLoginOpen] = useState(false);
 
-  // Dynamic: replace with API call when ready
   useEffect(() => {
     // fetch("/api/site-stats").then(r => r.json()).then(setStats);
   }, []);
@@ -37,11 +38,16 @@ export default function HomePage() {
             <a href="#about" className="hover:text-foreground transition-colors">About</a>
             <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
-          <Link to="/booking/dashboard">
-            <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0">
-              <Users size={14} className="mr-1" /> Login
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={() => setLoginOpen(true)} className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0">
+              <Users size={14} className="mr-1" /> Member Login
             </Button>
-          </Link>
+            <Link to="/admin/login">
+              <Button size="sm" variant="outline" className="hidden sm:inline-flex">
+                <Shield size={14} className="mr-1" /> Admin
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -57,11 +63,9 @@ export default function HomePage() {
             Uniting our community through tradition, culture, and shared values. Together we celebrate our heritage and build a stronger future for generations to come.
           </p>
           <div className="flex items-center justify-center gap-3">
-            <Link to="/booking/dashboard">
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 bg-transparent">
-                Login <ArrowRight size={14} className="ml-1" />
-              </Button>
-            </Link>
+            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 bg-transparent" onClick={() => setLoginOpen(true)}>
+              Member Login <ArrowRight size={14} className="ml-1" />
+            </Button>
             <a href="#contact">
               <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 bg-transparent">
                 Contact Us
@@ -96,31 +100,16 @@ export default function HomePage() {
           <div>
             <p className="text-sm font-semibold text-orange-500 mb-2">About Our Community</p>
             <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-              <p>
-                The Adi Goud Brahmin Mahasabha is a vibrant community organization dedicated to preserving and promoting our rich cultural heritage. For over 25 years, we have been bringing together families across India to celebrate our traditions, values, and shared identity.
-              </p>
-              <p>
-                Our mission is to foster unity, support educational initiatives, organize cultural events, and provide a platform for community members to connect, collaborate, and grow together. We believe in honoring our past while building a progressive future.
-              </p>
-              <p>
-                Through various programs, festivals, and social initiatives, we strive to create meaningful experiences that strengthen our bonds and pass on our cherished traditions to the next generation.
-              </p>
+              <p>The Adi Goud Brahmin Mahasabha is a vibrant community organization dedicated to preserving and promoting our rich cultural heritage. For over 25 years, we have been bringing together families across India.</p>
+              <p>Our mission is to foster unity, support educational initiatives, organize cultural events, and provide a platform for community members to connect, collaborate, and grow together.</p>
+              <p>Through various programs, festivals, and social initiatives, we strive to create meaningful experiences that strengthen our bonds and pass on our cherished traditions.</p>
             </div>
-            <Link to="/booking/dashboard" className="inline-block mt-6">
-              <Button size="sm" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
-                Learn More <ArrowRight size={14} className="ml-1" />
-              </Button>
-            </Link>
+            <Button size="sm" className="mt-6 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white" onClick={() => setLoginOpen(true)}>
+              Join Us <ArrowRight size={14} className="ml-1" />
+            </Button>
           </div>
           <div className="rounded-xl overflow-hidden shadow-lg">
-            <img
-              src="/images/agbm-building.jpg"
-              alt="Adi Goud Brahmin Mahasabha Building"
-              className="w-full h-auto object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/placeholder.svg";
-              }}
-            />
+            <img src="/images/agbm-building.jpg" alt="Adi Goud Brahmin Mahasabha Building" className="w-full h-auto object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
           </div>
         </div>
       </section>
@@ -129,14 +118,10 @@ export default function HomePage() {
       <section className="py-16 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white text-center">
         <div className="max-w-2xl mx-auto px-4">
           <h2 className="text-xl md:text-2xl font-bold mb-3">Join Our Growing Community</h2>
-          <p className="opacity-90 text-sm md:text-base mb-6">
-            Be part of a thriving community that values tradition, culture, and togetherness. Sign in today and connect with fellow members across the nation.
-          </p>
-          <Link to="/booking/dashboard">
-            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 bg-transparent">
-              Member Login <ArrowRight size={14} className="ml-1" />
-            </Button>
-          </Link>
+          <p className="opacity-90 text-sm md:text-base mb-6">Be part of a thriving community that values tradition, culture, and togetherness.</p>
+          <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 bg-transparent" onClick={() => setLoginOpen(true)}>
+            Member Login <ArrowRight size={14} className="ml-1" />
+          </Button>
         </div>
       </section>
 
@@ -153,27 +138,16 @@ export default function HomePage() {
           <div>
             <h3 className="font-semibold text-white text-sm mb-3">Contact Us</h3>
             <div className="space-y-2 text-xs">
-              <div className="flex items-start gap-2">
-                <MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" />
-                <span>Adi Goud Brahmin Mahasabha Charitable Trust, 417, Vegetarian Village, Puzhal, Chennai, Tamil Nadu 600060</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone size={14} className="shrink-0 text-orange-400" />
-                <span>+91 7603961126</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail size={14} className="shrink-0 text-orange-400" />
-                <span>agbm.chennai@gmail.com</span>
-              </div>
+              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" /><span>Adi Goud Brahmin Mahasabha Charitable Trust, 417, Vegetarian Village, Puzhal, Chennai, Tamil Nadu 600060</span></div>
+              <div className="flex items-center gap-2"><Phone size={14} className="shrink-0 text-orange-400" /><span>+91 7603961126</span></div>
+              <div className="flex items-center gap-2"><Mail size={14} className="shrink-0 text-orange-400" /><span>agbm.chennai@gmail.com</span></div>
             </div>
           </div>
           <div>
             <h3 className="font-semibold text-white text-sm mb-3">Follow Us</h3>
             <div className="flex gap-3">
               {[Facebook, Instagram, Twitter].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 rounded-full bg-white/10 hover:bg-orange-500 transition-colors flex items-center justify-center">
-                  <Icon size={16} />
-                </a>
+                <a key={i} href="#" className="w-9 h-9 rounded-full bg-white/10 hover:bg-orange-500 transition-colors flex items-center justify-center"><Icon size={16} /></a>
               ))}
             </div>
           </div>
@@ -182,6 +156,9 @@ export default function HomePage() {
           © {new Date().getFullYear()} Adi Goud Brahmin Mahasabha. All rights reserved.
         </div>
       </footer>
+
+      {/* Member Login Dialog */}
+      <MemberLoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
     </div>
   );
 }
