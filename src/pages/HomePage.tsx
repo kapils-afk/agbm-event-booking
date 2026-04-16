@@ -53,8 +53,7 @@ export default function HomePage() {
 
       {/* Hero */}
       <section id="home" className="relative bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white">
-        <div className="absolute inset-0 bg-[url('/images/adigoud-banner.jpg')] bg-cover bg-center opacity-20" />
-        <div className="relative max-w-4xl mx-auto text-center px-4 py-20 md:py-28">
+        <div className="max-w-4xl mx-auto text-center px-4 py-20 md:py-28">
           <div className="mx-auto w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center mb-6">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-lg">AG</div>
           </div>
@@ -109,7 +108,7 @@ export default function HomePage() {
             </Button>
           </div>
           <div className="rounded-xl overflow-hidden shadow-lg">
-            <img src="/images/agbm-building.jpg" alt="Adi Goud Brahmin Mahasabha Building" className="w-full h-auto object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
+            <img src="/images/agbm-building.png" alt="Chhabil Das Gulab Rai Goud Bhavan Chennai" className="w-full h-auto object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
           </div>
         </div>
       </section>
