@@ -137,7 +137,7 @@ export default function NewBooking() {
 
     toast.success("Booking saved successfully!");
     generateBookingPDF(booking);
-    navigate("/bookings");
+    navigate("/booking/manage");
   };
 
   const renderField = (label: string, field: string, type = "text", required = true, placeholder = "") => (
@@ -303,7 +303,7 @@ export default function NewBooking() {
       </Card>
 
       <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={() => navigate("/")}>Cancel</Button>
+        <Button variant="outline" onClick={() => navigate("/booking/dashboard")}>Cancel</Button>
         <Button onClick={handleSubmit}>Submit Booking & Download PDF</Button>
       </div>
     </div>

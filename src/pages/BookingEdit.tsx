@@ -30,7 +30,7 @@ export default function BookingEdit() {
 
   useEffect(() => {
     const booking = getBookings().find((b) => b.id === id);
-    if (!booking) { toast.error("Booking not found"); navigate("/bookings"); return; }
+    if (!booking) { toast.error("Booking not found"); navigate("/booking/manage"); return; }
     setForm({
       ...booking,
       advancePayment: booking.advancePayment?.toString() || "",
@@ -86,7 +86,7 @@ export default function BookingEdit() {
       return;
     }
     toast.success("Booking updated");
-    navigate("/bookings");
+    navigate("/booking/manage");
   };
 
   const handleDownloadPDF = () => {
@@ -191,7 +191,7 @@ export default function BookingEdit() {
       </Card>
 
       <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={() => navigate("/bookings")}>Cancel</Button>
+        <Button variant="outline" onClick={() => navigate("/booking/manage")}>Cancel</Button>
         <Button variant="outline" onClick={handleDownloadPDF}>Download PDF</Button>
         <Button onClick={handleSave}>Save Changes</Button>
       </div>
