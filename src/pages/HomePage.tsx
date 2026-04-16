@@ -30,7 +30,7 @@ export default function HomePage() {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-border">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-sm">AG</div>
+            <img src="/images/agbm-logo.png" alt="AGBM Logo" className="w-9 h-9 rounded-full object-cover" />
             <span className="font-bold text-foreground text-sm md:text-base">Adi Goud Brahmin Mahasabha</span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
@@ -55,7 +55,7 @@ export default function HomePage() {
       <section id="home" className="relative bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white">
         <div className="max-w-4xl mx-auto text-center px-4 py-20 md:py-28">
           <div className="mx-auto w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center mb-6">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-lg">AG</div>
+            <img src="/images/agbm-logo.png" alt="AGBM Logo" className="w-12 h-12 rounded-full object-cover" />
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">Adi Goud Brahmin Mahasabha</h1>
           <p className="text-base md:text-lg opacity-90 max-w-2xl mx-auto mb-8 leading-relaxed">
@@ -129,7 +129,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-xs">AG</div>
+              <img src="/images/agbm-logo.png" alt="AGBM Logo" className="w-8 h-8 rounded-full object-cover" />
               <span className="font-bold text-white text-sm">Adi Goud Brahmin Mahasabha</span>
             </div>
             <p className="text-xs opacity-70">Preserving our heritage, building our future together as one community.</p>
