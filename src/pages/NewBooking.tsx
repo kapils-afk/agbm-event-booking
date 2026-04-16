@@ -137,7 +137,7 @@ export default function NewBooking() {
 
     toast.success("Booking saved successfully!");
     generateBookingPDF(booking);
-    navigate("/bookings");
+    navigate("/booking/manage");
   };
 
   const renderField = (label: string, field: string, type = "text", required = true, placeholder = "") => (
