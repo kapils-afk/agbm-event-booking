@@ -85,13 +85,22 @@ export default function BookingLayout({ children }: { children: React.ReactNode 
                   </Link>
                 );
               })}
-              <Link
-                to="/"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors mt-4 border-t border-sidebar-border pt-4"
-              >
-                <Home size={18} /> Back to Home
-              </Link>
+              <div className="mt-4 border-t border-sidebar-border pt-4 space-y-1">
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors"
+                >
+                  <Shield size={18} /> Admin Panel
+                </Link>
+                <Link
+                  to="/"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors"
+                >
+                  <Home size={18} /> Back to Home
+                </Link>
+              </div>
             </nav>
           </div>
         )}
