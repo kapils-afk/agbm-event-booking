@@ -37,7 +37,13 @@ export default function BookingLayout({ children }: { children: React.ReactNode 
             );
           })}
         </nav>
-        <div className="p-3 border-t border-sidebar-border">
+        <div className="p-3 border-t border-sidebar-border space-y-1">
+          <Link
+            to="/admin"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors"
+          >
+            <Shield size={18} /> Admin Panel
+          </Link>
           <Link
             to="/"
             className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors"
