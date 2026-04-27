@@ -71,6 +71,60 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          amount: number
+          amount_in_words: string | null
+          collected_by: string | null
+          created_at: string
+          donation_date: string
+          donor_name: string
+          id: string
+          mobile: string | null
+          notes: string | null
+          pan: string | null
+          payment_method: string
+          purpose: string
+          receipt_no: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          amount_in_words?: string | null
+          collected_by?: string | null
+          created_at?: string
+          donation_date?: string
+          donor_name: string
+          id?: string
+          mobile?: string | null
+          notes?: string | null
+          pan?: string | null
+          payment_method: string
+          purpose: string
+          receipt_no: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          amount_in_words?: string | null
+          collected_by?: string | null
+          created_at?: string
+          donation_date?: string
+          donor_name?: string
+          id?: string
+          mobile?: string | null
+          notes?: string | null
+          pan?: string | null
+          payment_method?: string
+          purpose?: string
+          receipt_no?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string

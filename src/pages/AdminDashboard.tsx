@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Users, Megaphone, Image, CalendarDays, Award, UserCheck,
-  LogOut, ArrowLeft, Shield, LayoutDashboard
+  LogOut, ArrowLeft, Shield, LayoutDashboard, HeartHandshake
 } from "lucide-react";
 
 interface AdminSession {
@@ -22,6 +22,7 @@ interface ModuleStats {
   events: number;
   officeBearers: number;
   trustCommittee: number;
+  trust: number;
 }
 
 const modules = [
@@ -31,11 +32,12 @@ const modules = [
   { key: "events", title: "Events", description: "Create and manage community events", icon: CalendarDays, color: "from-green-500 to-emerald-500", route: "/admin/events" },
   { key: "officeBearers", title: "Office Bearers", description: "Manage office bearer details and photos", icon: Award, color: "from-red-500 to-rose-500", route: "/admin/office-bearers" },
   { key: "trustCommittee", title: "Trust Committee", description: "Manage trust committee members", icon: UserCheck, color: "from-teal-500 to-cyan-500", route: "/admin/trust-committee" },
+  { key: "trust", title: "Charitable Trust", description: "Donor entries, receipts & dashboard", icon: HeartHandshake, color: "from-rose-500 to-pink-600", route: "/admin/trust" },
 ];
 
 export default function AdminDashboard() {
   const [admin, setAdmin] = useState<AdminSession | null>(null);
-  const [stats, setStats] = useState<ModuleStats>({ members: 0, announcements: 0, gallery: 0, events: 0, officeBearers: 0, trustCommittee: 0 });
+  const [stats, setStats] = useState<ModuleStats>({ members: 0, announcements: 0, gallery: 0, events: 0, officeBearers: 0, trustCommittee: 0, trust: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,13 +51,14 @@ export default function AdminDashboard() {
   }, [navigate]);
 
   const fetchStats = async () => {
-    const [m, a, g, e, ob, tc] = await Promise.all([
+    const [m, a, g, e, ob, tc, tr] = await Promise.all([
       supabase.from("members").select("id", { count: "exact", head: true }),
       supabase.from("announcements").select("id", { count: "exact", head: true }),
       supabase.from("gallery").select("id", { count: "exact", head: true }),
       supabase.from("events").select("id", { count: "exact", head: true }),
       supabase.from("office_bearers").select("id", { count: "exact", head: true }),
       supabase.from("trust_committee").select("id", { count: "exact", head: true }),
+      supabase.from("donations").select("id", { count: "exact", head: true }),
     ]);
     setStats({
       members: m.count || 0,
@@ -64,6 +67,7 @@ export default function AdminDashboard() {
       events: e.count || 0,
       officeBearers: ob.count || 0,
       trustCommittee: tc.count || 0,
+      trust: tr.count || 0,
     });
   };
 
