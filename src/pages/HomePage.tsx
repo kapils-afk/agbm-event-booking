@@ -292,7 +292,7 @@ export default function HomePage() {
 
       {/* Forum Section */}
       <section id="forum" className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
             <p className="text-sm font-semibold text-orange-500 mb-2 flex items-center justify-center gap-2">
               <MessageSquare size={16} /> Community Forum
@@ -301,117 +301,110 @@ export default function HomePage() {
             <p className="text-sm text-muted-foreground mt-2">Ask questions, share thoughts, or celebrate with the community.</p>
           </div>
 
-          <Card className="p-5 mb-6">
-            <form onSubmit={handleForumPost} className="space-y-3">
-              <Input
-                placeholder="Your name"
-                value={forumInput.name}
-                onChange={(e) => setForumInput({ ...forumInput, name: e.target.value })}
-                maxLength={60}
-              />
-              <Textarea
-                placeholder="Write a message to the community..."
-                value={forumInput.message}
-                onChange={(e) => setForumInput({ ...forumInput, message: e.target.value })}
-                maxLength={500}
-                rows={3}
-              />
-              <div className="flex justify-end">
-                <Button type="submit" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
-                  Post
-                </Button>
-              </div>
-            </form>
-          </Card>
-
-          <div className="space-y-3">
-            {forumPosts.map((p) => (
-              <Card key={p.id} className="p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="font-semibold text-sm text-foreground">{p.name}</p>
-                  <p className="text-xs text-muted-foreground">{new Date(p.at).toLocaleString("en-IN")}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left: Post form */}
+            <Card className="p-5 h-fit">
+              <h3 className="font-semibold text-foreground mb-4 text-sm">Start a new post</h3>
+              <form onSubmit={handleForumPost} className="space-y-3">
+                <Input
+                  placeholder="Your name"
+                  value={forumInput.name}
+                  onChange={(e) => setForumInput({ ...forumInput, name: e.target.value })}
+                  maxLength={60}
+                />
+                <Textarea
+                  placeholder="Write a message to the community..."
+                  value={forumInput.message}
+                  onChange={(e) => setForumInput({ ...forumInput, message: e.target.value })}
+                  maxLength={500}
+                  rows={6}
+                />
+                <div className="flex justify-end">
+                  <Button type="submit" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+                    Post
+                  </Button>
                 </div>
-                <p className="text-sm text-muted-foreground">{p.message}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Form */}
-      <section id="contact-form" className="py-16 bg-orange-50/50">
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <p className="text-sm font-semibold text-orange-500 mb-2">Get in Touch</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Contact the Admin</h2>
-            <p className="text-sm text-muted-foreground mt-2">Send us a message and our team will get back to you shortly.</p>
-          </div>
-          <Card className="p-6">
-            {submitted ? (
-              <div className="text-center py-8">
-                <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                  <CheckCircle2 className="text-green-600" size={32} />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Thank You!</h3>
-                <p className="text-sm text-muted-foreground mb-5">
-                  Your message has been received. We'll get back to you as soon as possible.
-                </p>
-                <Button variant="outline" onClick={() => setSubmitted(false)}>Send another message</Button>
-              </div>
-            ) : (
-              <form onSubmit={handleContactSubmit} className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground">Name *</label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your full name" maxLength={100} required />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-foreground">Email</label>
-                    <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" maxLength={255} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-foreground">Mobile</label>
-                    <Input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} placeholder="+91 9876543210" maxLength={20} />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground">Message *</label>
-                  <Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="How can we help?" rows={5} maxLength={1000} required />
-                </div>
-                <Button type="submit" disabled={submitting} className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
-                  {submitting ? "Sending..." : "Send Message"}
-                </Button>
               </form>
-            )}
-          </Card>
+            </Card>
+
+            {/* Right: Scrollable posts */}
+            <Card className="p-5">
+              <h3 className="font-semibold text-foreground mb-4 text-sm flex items-center justify-between">
+                <span>Recent posts</span>
+                <span className="text-xs text-muted-foreground font-normal">{forumPosts.length} messages</span>
+              </h3>
+              <ScrollArea className="h-[360px] pr-3">
+                <div className="space-y-3">
+                  {forumPosts.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-8">No posts yet. Be the first to share!</p>
+                  )}
+                  {forumPosts.map((p) => (
+                    <div key={p.id} className="border border-border rounded-lg p-3 bg-orange-50/30">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-semibold text-sm text-foreground">{p.name}</p>
+                        <p className="text-xs text-muted-foreground">{new Date(p.at).toLocaleString("en-IN")}</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{p.message}</p>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </Card>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer with compact contact form */}
       <footer id="contact" className="bg-foreground text-white/80 py-12">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <img src="/images/agbm-logo.png" alt="AGBM Logo" className="w-8 h-8 rounded-full object-cover" />
               <span className="font-bold text-white text-sm">Adi Goud Brahmin Mahasabha</span>
             </div>
             <p className="text-xs opacity-70">Preserving our heritage, building our future together as one community.</p>
+            <div className="flex gap-3 mt-4">
+              {[Facebook, Instagram, Twitter].map((Icon, i) => (
+                <a key={i} href="#" className="w-8 h-8 rounded-full bg-white/10 hover:bg-orange-500 transition-colors flex items-center justify-center"><Icon size={14} /></a>
+              ))}
+            </div>
           </div>
           <div>
             <h3 className="font-semibold text-white text-sm mb-3">Contact Us</h3>
             <div className="space-y-2 text-xs">
-              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" /><span>Adi Goud Brahmin Mahasabha Charitable Trust, 417, Vegetarian Village, Puzhal, Chennai, Tamil Nadu 600060</span></div>
+              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" /><span>417, Vegetarian Village, Puzhal, Chennai, Tamil Nadu 600060</span></div>
               <div className="flex items-center gap-2"><Phone size={14} className="shrink-0 text-orange-400" /><span>+91 7603961126</span></div>
               <div className="flex items-center gap-2"><Mail size={14} className="shrink-0 text-orange-400" /><span>agbm.chennai@gmail.com</span></div>
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-white text-sm mb-3">Follow Us</h3>
-            <div className="flex gap-3">
-              {[Facebook, Instagram, Twitter].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 rounded-full bg-white/10 hover:bg-orange-500 transition-colors flex items-center justify-center"><Icon size={16} /></a>
-              ))}
-            </div>
+
+          {/* Compact contact form */}
+          <div className="lg:col-span-2">
+            <h3 className="font-semibold text-white text-sm mb-3">Reach the Admin</h3>
+            {submitted ? (
+              <div className="bg-white/5 rounded-lg p-4 text-center">
+                <div className="mx-auto w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center mb-2">
+                  <CheckCircle2 className="text-green-400" size={20} />
+                </div>
+                <p className="text-white text-sm font-semibold mb-1">Thank You!</p>
+                <p className="text-xs opacity-70 mb-3">Your message has been received.</p>
+                <Button size="sm" variant="outline" onClick={() => setSubmitted(false)} className="bg-transparent border-white/30 text-white hover:bg-white hover:text-foreground">
+                  Send another
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleContactSubmit} className="space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name *" maxLength={100} required className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-9 text-xs" />
+                  <Input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} placeholder="Mobile" maxLength={20} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-9 text-xs" />
+                </div>
+                <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" maxLength={255} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-9 text-xs" />
+                <Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Your message *" rows={3} maxLength={1000} required className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-xs resize-none" />
+                <Button type="submit" size="sm" disabled={submitting} className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+                  {submitting ? "Sending..." : "Send Message"}
+                </Button>
+              </form>
+            )}
           </div>
         </div>
         <div className="max-w-6xl mx-auto px-4 mt-8 pt-6 border-t border-white/10 text-center text-xs opacity-60">
