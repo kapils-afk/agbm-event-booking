@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import BookingLayout from "@/components/BookingLayout";
 import HomePage from "@/pages/HomePage";
+import GalleryPage from "@/pages/GalleryPage";
 import Dashboard from "@/pages/Dashboard";
 import NewBooking from "@/pages/NewBooking";
 import BookingManagement from "@/pages/BookingManagement";
