@@ -100,21 +100,17 @@ export default function AdminTrustList() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Filter by name or mobile…"
-            className="max-w-sm"
-          />
+      <main className="max-w-7xl mx-auto px-4 py-6 space-y-2">
+        <div className="flex flex-wrap items-center justify-end gap-3">
           <div className="text-sm text-muted-foreground">
-            Showing <b>{filtered.length}</b> · Total{" "}
+            Total{" "}
             <span className="inline-flex items-center font-bold text-emerald-600">
-              <IndianRupee size={12} />{total.toLocaleString("en-IN")}
+              <IndianRupee size={12} />{total_amt.toLocaleString("en-IN")}
             </span>
           </div>
         </div>
+
+        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by donor, mobile or receipt no..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
 
         <Card>
           <CardContent className="p-0 overflow-x-auto">
@@ -132,9 +128,9 @@ export default function AdminTrustList() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.length === 0 ? (
+                {paged.length === 0 ? (
                   <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground">No donations found</TableCell></TableRow>
-                ) : filtered.map(d => (
+                ) : paged.map(d => (
                   <TableRow key={d.id}>
                     <TableCell className="font-mono text-xs">{d.receipt_no}</TableCell>
                     <TableCell>{new Date(d.donation_date).toLocaleDateString("en-GB")}</TableCell>
@@ -155,6 +151,7 @@ export default function AdminTrustList() {
             </Table>
           </CardContent>
         </Card>
+        <DataTablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
       </main>
     </div>
   );
