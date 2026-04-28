@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Megaphone } from "lucide-react";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
 
 export default function AdminAnnouncements() {
   const [items, setItems] = useState<any[]>([]);
@@ -17,15 +18,18 @@ export default function AdminAnnouncements() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) { navigate("/admin/login"); return; }
-    fetch();
+    fetchData();
   }, []);
 
-  const fetch = async () => {
+  const fetchData = async () => {
     const { data } = await supabase.from("announcements").select("*").order("created_at", { ascending: false });
     if (data) setItems(data);
   };
@@ -35,14 +39,11 @@ export default function AdminAnnouncements() {
     if (!form.title || !form.content) { toast({ title: "Error", description: "All fields required", variant: "destructive" }); return; }
     setLoading(true);
     try {
-      if (editId) {
-        await supabase.from("announcements").update(form).eq("id", editId);
-      } else {
-        await supabase.from("announcements").insert(form);
-      }
+      if (editId) await supabase.from("announcements").update(form).eq("id", editId);
+      else await supabase.from("announcements").insert(form);
       toast({ title: "Saved" });
       setShowForm(false); setEditId(null); setForm({ title: "", content: "" });
-      fetch();
+      fetchData();
     } catch (err: any) { toast({ title: "Error", description: err.message, variant: "destructive" }); }
     finally { setLoading(false); }
   };
@@ -50,8 +51,15 @@ export default function AdminAnnouncements() {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete?")) return;
     await supabase.from("announcements").delete().eq("id", id);
-    toast({ title: "Deleted" }); fetch();
+    toast({ title: "Deleted" }); fetchData();
   };
+
+  const { paged, total } = useMemo(
+    () => usePaginatedFilter(items, search, pageSize, page, (i, q) =>
+      i.title.toLowerCase().includes(q) || (i.content || "").toLowerCase().includes(q)
+    ),
+    [items, search, pageSize, page]
+  );
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -65,12 +73,13 @@ export default function AdminAnnouncements() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
+        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search announcements..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
         <Card><CardContent className="p-0">
           <Table>
             <TableHeader><TableRow><TableHead>Title</TableHead><TableHead>Content</TableHead><TableHead>Date</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
             <TableBody>
-              {items.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No announcements</TableCell></TableRow> :
-              items.map(i => (
+              {paged.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No announcements found</TableCell></TableRow> :
+              paged.map(i => (
                 <TableRow key={i.id}>
                   <TableCell className="font-medium">{i.title}</TableCell>
                   <TableCell className="max-w-xs truncate">{i.content}</TableCell>
@@ -84,6 +93,7 @@ export default function AdminAnnouncements() {
             </TableBody>
           </Table>
         </CardContent></Card>
+        <DataTablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
       </main>
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent><DialogHeader><DialogTitle>{editId ? "Edit" : "New"} Announcement</DialogTitle></DialogHeader>
