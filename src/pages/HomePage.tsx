@@ -241,19 +241,51 @@ export default function HomePage() {
             <CarouselContent>
               {defaultGallery.map((g, i) => (
                 <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="rounded-xl overflow-hidden shadow-md group relative aspect-[4/3]">
+                  <button
+                    type="button"
+                    onClick={() => setPreview({ url: g.url, title: g.title })}
+                    className="rounded-xl overflow-hidden shadow-md group relative aspect-[4/3] block w-full text-left focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
                     <img src={g.url} alt={g.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
                       <p className="text-white text-sm font-medium">{g.title}</p>
                     </div>
-                  </div>
+                  </button>
                 </CarouselItem>
               ))}
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
           </Carousel>
+          <div className="text-center mt-8">
+            <Link to="/gallery">
+              <Button variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
+                View Full Gallery <ArrowRight size={14} className="ml-1" />
+              </Button>
+            </Link>
+          </div>
         </div>
+
+        {/* Lightbox */}
+        <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
+          <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background">
+            {preview && (
+              <div className="relative">
+                <button
+                  onClick={() => setPreview(null)}
+                  className="absolute top-2 right-2 z-10 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5"
+                  aria-label="Close"
+                >
+                  <X size={16} />
+                </button>
+                <img src={preview.url} alt={preview.title} className="w-full max-h-[70vh] object-contain bg-black" />
+                <div className="p-4">
+                  <h3 className="font-semibold text-foreground">{preview.title}</h3>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </section>
 
       {/* Events Section */}
