@@ -73,6 +73,7 @@ export default function HomePage() {
   const [stats] = useState<SiteStats>(defaultStats);
   const [events, setEvents] = useState<EventItem[]>(defaultEvents);
   const [galleryApi, setGalleryApi] = useState<CarouselApi | undefined>();
+  const [preview, setPreview] = useState<{ url: string; title: string } | null>(null);
   const autoplayRef = useRef<number | null>(null);
 
   // Contact form
