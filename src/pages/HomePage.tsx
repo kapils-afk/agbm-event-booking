@@ -91,7 +91,7 @@ export default function HomePage() {
   const [forumInput, setForumInput] = useState({ name: "", message: "" });
 
   useEffect(() => {
-    api.siteStats().then(setStats).catch(() => {});
+    // api.siteStats().then(setStats).catch(() => {});
   }, []);
 
   // Autoplay carousel
