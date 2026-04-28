@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Users } from "lucide-react";
 import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
-import { useMemo } from "react";
+
 
 interface Member {
   id: string;
@@ -145,6 +145,7 @@ export default function AdminMembers() {
             </Table>
           </CardContent>
         </Card>
+        <DataTablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
       </main>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
