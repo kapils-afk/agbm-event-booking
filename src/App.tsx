@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import BookingLayout from "@/components/BookingLayout";
 import HomePage from "@/pages/HomePage";
+import GalleryPage from "@/pages/GalleryPage";
 import Dashboard from "@/pages/Dashboard";
 import NewBooking from "@/pages/NewBooking";
 import BookingManagement from "@/pages/BookingManagement";
@@ -17,6 +18,9 @@ import AdminGallery from "@/pages/admin/AdminGallery";
 import AdminEvents from "@/pages/admin/AdminEvents";
 import AdminOfficeBearers from "@/pages/admin/AdminOfficeBearers";
 import AdminTrustCommittee from "@/pages/admin/AdminTrustCommittee";
+import AdminTrustDashboard from "@/pages/admin/AdminTrustDashboard";
+import AdminTrustList from "@/pages/admin/AdminTrustList";
+import AdminTrustEntry from "@/pages/admin/AdminTrustEntry";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +33,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
 
           {/* Admin routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -39,6 +44,10 @@ const App = () => (
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/office-bearers" element={<AdminOfficeBearers />} />
           <Route path="/admin/trust-committee" element={<AdminTrustCommittee />} />
+          <Route path="/admin/trust" element={<AdminTrustDashboard />} />
+          <Route path="/admin/trust/list" element={<AdminTrustList />} />
+          <Route path="/admin/trust/new" element={<AdminTrustEntry />} />
+          <Route path="/admin/trust/edit/:id" element={<AdminTrustEntry />} />
 
           {/* Booking system - nested routes */}
           <Route path="/booking" element={<BookingLayout />}>

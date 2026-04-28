@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -9,13 +9,19 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Award } from "lucide-react";
+import { ImageUploader } from "@/components/admin/ImageUploader";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
 
 export default function AdminOfficeBearers() {
   const [items, setItems] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", designation: "", photo_url: "", display_order: "0" });
+  const emptyForm = { name: "", designation: "", photo_url: "", display_order: "0" };
+  const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -45,6 +51,13 @@ export default function AdminOfficeBearers() {
     toast({ title: "Deleted" }); fetchData();
   };
 
+  const { paged, total } = useMemo(
+    () => usePaginatedFilter(items, search, pageSize, page, (i, q) =>
+      i.name.toLowerCase().includes(q) || i.designation.toLowerCase().includes(q)
+    ),
+    [items, search, pageSize, page]
+  );
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b shadow-sm sticky top-0 z-50">
@@ -53,17 +66,19 @@ export default function AdminOfficeBearers() {
             <Link to="/admin"><Button variant="ghost" size="sm"><ArrowLeft size={14} /></Button></Link>
             <div className="flex items-center gap-2"><Award size={18} className="text-red-500" /><h1 className="font-bold">Office Bearers</h1></div>
           </div>
-          <Button size="sm" onClick={() => { setEditId(null); setForm({ name: "", designation: "", photo_url: "", display_order: "0" }); setShowForm(true); }} className="bg-gradient-to-r from-orange-500 to-red-500 text-white"><Plus size={14} className="mr-1" /> Add</Button>
+          <Button size="sm" onClick={() => { setEditId(null); setForm(emptyForm); setShowForm(true); }} className="bg-gradient-to-r from-orange-500 to-red-500 text-white"><Plus size={14} className="mr-1" /> Add</Button>
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
+        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by name or designation..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
         <Card><CardContent className="p-0">
           <Table>
-            <TableHeader><TableRow><TableHead>Order</TableHead><TableHead>Name</TableHead><TableHead>Designation</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Photo</TableHead><TableHead>Order</TableHead><TableHead>Name</TableHead><TableHead>Designation</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
             <TableBody>
-              {items.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No office bearers</TableCell></TableRow> :
-              items.map(i => (
+              {paged.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No office bearers found</TableCell></TableRow> :
+              paged.map(i => (
                 <TableRow key={i.id}>
+                  <TableCell>{i.photo_url ? <img src={i.photo_url} alt={i.name} className="w-10 h-10 rounded-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} /> : <div className="w-10 h-10 rounded-full bg-muted" />}</TableCell>
                   <TableCell>{i.display_order}</TableCell>
                   <TableCell className="font-medium">{i.name}</TableCell>
                   <TableCell>{i.designation}</TableCell>
@@ -76,14 +91,15 @@ export default function AdminOfficeBearers() {
             </TableBody>
           </Table>
         </CardContent></Card>
+        <DataTablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
       </main>
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent><DialogHeader><DialogTitle>{editId ? "Edit" : "Add"} Office Bearer</DialogTitle></DialogHeader>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>{editId ? "Edit" : "Add"} Office Bearer</DialogTitle></DialogHeader>
           <form onSubmit={handleSave} className="space-y-3">
             <div><Label>Name *</Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
             <div><Label>Designation *</Label><Input value={form.designation} onChange={e => setForm(f => ({ ...f, designation: e.target.value }))} /></div>
-            <div><Label>Photo URL</Label><Input value={form.photo_url} onChange={e => setForm(f => ({ ...f, photo_url: e.target.value }))} /></div>
             <div><Label>Display Order</Label><Input type="number" value={form.display_order} onChange={e => setForm(f => ({ ...f, display_order: e.target.value }))} /></div>
+            <div><Label>Photo</Label><ImageUploader value={form.photo_url} onChange={(url) => setForm(f => ({ ...f, photo_url: url }))} folder="office-bearers" maxSizeMB={5} /></div>
             <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white" disabled={loading}>{loading ? "Saving..." : "Save"}</Button>
           </form>
         </DialogContent>

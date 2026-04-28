@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, Plus, Trash2, Edit, Search, Users } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit, Users } from "lucide-react";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+
 
 export default function AdminMembers() {
   const [members, setMembers] = useState<any[]>([]);
@@ -56,7 +58,14 @@ export default function AdminMembers() {
     fetchMembers();
   };
 
-  const filtered = members.filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.mobile.includes(search));
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const { paged, total } = useMemo(
+    () => usePaginatedFilter(members, search, pageSize, page, (m, q) =>
+      m.name.toLowerCase().includes(q) || m.mobile.includes(q) || (m.email || "").toLowerCase().includes(q)
+    ),
+    [members, search, pageSize, page]
+  );
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -72,32 +81,41 @@ export default function AdminMembers() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <div className="relative mb-4 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search by name or mobile..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
-        </div>
-        <Card><CardContent className="p-0">
-          <Table>
-            <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Mobile</TableHead><TableHead>Email</TableHead><TableHead>Aadhaar</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
-            <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No members found</TableCell></TableRow>
-              ) : filtered.map(m => (
-                <TableRow key={m.id}>
-                  <TableCell className="font-medium">{m.name}</TableCell>
-                  <TableCell>{m.mobile}</TableCell>
-                  <TableCell>{m.email || "—"}</TableCell>
-                  <TableCell>{m.aadhaar || "—"}</TableCell>
-                  <TableCell><span className={`px-2 py-0.5 rounded-full text-xs ${m.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{m.is_active ? "Active" : "Inactive"}</span></TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => { setEditId(m.id); setForm({ name: m.name, mobile: m.mobile, password: "", email: m.email || "", aadhaar: m.aadhaar || "", address: m.address || "" }); setShowForm(true); }}><Edit size={14} /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)}><Trash2 size={14} className="text-destructive" /></Button>
-                  </TableCell>
+        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by name, mobile or email..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Mobile</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Aadhaar</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent></Card>
+              </TableHeader>
+              <TableBody>
+                {paged.length === 0 ? (
+                  <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No members found</TableCell></TableRow>
+                ) : paged.map(m => (
+                  <TableRow key={m.id}>
+                    <TableCell className="font-medium">{m.name}</TableCell>
+                    <TableCell>{m.mobile}</TableCell>
+                    <TableCell>{m.email || "—"}</TableCell>
+                    <TableCell>{m.aadhaar || "—"}</TableCell>
+                    <TableCell><span className={`px-2 py-0.5 rounded-full text-xs ${m.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{m.is_active ? "Active" : "Inactive"}</span></TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(m)}><Edit size={14} /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)}><Trash2 size={14} className="text-destructive" /></Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+        <DataTablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
       </main>
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="sm:max-w-md">
