@@ -9,10 +9,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowLeft, Plus, Edit, Trash2, Download, MessageCircle, FileSpreadsheet, HeartHandshake, IndianRupee } from "lucide-react";
 import { generateDonationReceiptPDF } from "@/lib/donationReceipt";
 import * as XLSX from "xlsx";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
 
 export default function AdminTrustList() {
   const [items, setItems] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -26,15 +29,14 @@ export default function AdminTrustList() {
     if (data) setItems(data);
   };
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter(d =>
-      d.donor_name.toLowerCase().includes(q) || (d.mobile || "").toLowerCase().includes(q)
-    );
-  }, [items, search]);
+  const { filtered, paged, total } = useMemo(
+    () => usePaginatedFilter(items, search, pageSize, page, (d, q) =>
+      d.donor_name.toLowerCase().includes(q) || (d.mobile || "").toLowerCase().includes(q) || (d.receipt_no || "").toLowerCase().includes(q)
+    ),
+    [items, search, pageSize, page]
+  );
 
-  const total = filtered.reduce((s, d) => s + Number(d.amount || 0), 0);
+  const total_amt = filtered.reduce((s, d) => s + Number(d.amount || 0), 0);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this donation entry?")) return;
