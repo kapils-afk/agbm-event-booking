@@ -131,6 +131,7 @@ export type Database = {
           description: string | null
           event_date: string
           id: string
+          image_url: string | null
           is_active: boolean | null
           title: string
           updated_at: string
@@ -141,6 +142,7 @@ export type Database = {
           description?: string | null
           event_date: string
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           title: string
           updated_at?: string
@@ -151,6 +153,7 @@ export type Database = {
           description?: string | null
           event_date?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           title?: string
           updated_at?: string
