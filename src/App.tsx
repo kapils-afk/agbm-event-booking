@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import BookingLayout from "@/components/BookingLayout";
 import HomePage from "@/pages/HomePage";
+import GalleryPage from "@/pages/GalleryPage";
 import Dashboard from "@/pages/Dashboard";
 import NewBooking from "@/pages/NewBooking";
 import BookingManagement from "@/pages/BookingManagement";
@@ -32,6 +33,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
 
           {/* Admin routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
