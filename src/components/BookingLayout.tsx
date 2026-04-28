@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, Outlet } from "react-router-dom";
 import { LayoutDashboard, Plus, List, Menu, X, Home } from "lucide-react";
 
 const navItems = [
@@ -8,7 +8,7 @@ const navItems = [
   { to: "/booking/manage", label: "Manage Bookings", icon: List },
 ];
 
-export default function BookingLayout({ children }: { children: React.ReactNode }) {
+export default function BookingLayout(/* children are provided by nested routes via Outlet */) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
@@ -90,7 +90,7 @@ export default function BookingLayout({ children }: { children: React.ReactNode 
           </div>
         )}
 
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto"><Outlet /></main>
       </div>
     </div>
   );

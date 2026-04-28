@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Lock, LogIn } from "lucide-react";
 
@@ -26,29 +26,15 @@ export default function MemberLoginDialog({ open, onOpenChange }: MemberLoginDia
       toast({ title: "Error", description: "Please enter mobile number and password", variant: "destructive" });
       return;
     }
-
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("members")
-        .select("*")
-        .eq("mobile", mobile)
-        .eq("password_hash", password)
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      if (data) {
-        localStorage.setItem("member_session", JSON.stringify({ id: data.id, name: data.name, mobile: data.mobile }));
-        toast({ title: "Welcome!", description: `Logged in as ${data.name}` });
-        onOpenChange(false);
-        navigate("/booking/dashboard");
-      } else {
-        toast({ title: "Login Failed", description: "Invalid mobile number or password", variant: "destructive" });
-      }
+      const data = await api.memberLogin(mobile, password);
+      localStorage.setItem("member_session", JSON.stringify(data));
+      toast({ title: "Welcome!", description: `Logged in as ${data.name}` });
+      onOpenChange(false);
+      navigate("/booking/dashboard");
     } catch (err: any) {
-      toast({ title: "Error", description: err.message || "Login failed", variant: "destructive" });
+      toast({ title: "Login Failed", description: err.message || "Invalid mobile number or password", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -71,29 +57,14 @@ export default function MemberLoginDialog({ open, onOpenChange }: MemberLoginDia
             <Label htmlFor="member-mobile">Mobile Number</Label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="member-mobile"
-                type="tel"
-                placeholder="Enter your mobile number"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
-                className="pl-10"
-                maxLength={10}
-              />
+              <Input id="member-mobile" type="tel" placeholder="Enter your mobile number" value={mobile} onChange={(e) => setMobile(e.target.value)} className="pl-10" maxLength={10} />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="member-password">Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="member-password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10"
-              />
+              <Input id="member-password" type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10" />
             </div>
           </div>
           <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white" disabled={loading}>

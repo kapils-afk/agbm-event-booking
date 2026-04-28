@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,19 +23,15 @@ export default function AdminGallery() {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    const { data } = await supabase.from("gallery").select("*").order("created_at", { ascending: false });
-    if (data) setItems(data);
-  };
+  const fetchData = () => api.getGallery().then(setItems).catch(() => {});
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.image_url) { toast({ title: "Error", description: "Title and image URL required", variant: "destructive" }); return; }
     setLoading(true);
     try {
-      const payload = { title: form.title, description: form.description || null, image_url: form.image_url, category: form.category || null };
-      if (editId) await supabase.from("gallery").update(payload).eq("id", editId);
-      else await supabase.from("gallery").insert(payload);
+      if (editId) await api.updateGallery(editId, form);
+      else await api.createGallery(form);
       toast({ title: "Saved" }); setShowForm(false); setEditId(null); setForm({ title: "", description: "", image_url: "", category: "" }); fetchData();
     } catch (err: any) { toast({ title: "Error", description: err.message, variant: "destructive" }); }
     finally { setLoading(false); }
@@ -43,7 +39,7 @@ export default function AdminGallery() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete?")) return;
-    await supabase.from("gallery").delete().eq("id", id);
+    await api.deleteGallery(id);
     toast({ title: "Deleted" }); fetchData();
   };
 

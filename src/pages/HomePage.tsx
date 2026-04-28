@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MemberLoginDialog from "@/components/MemberLoginDialog";
+import { api } from "@/lib/api";
 
 interface SiteStats {
   activeMembers: number;
@@ -21,7 +22,7 @@ export default function HomePage() {
   const [loginOpen, setLoginOpen] = useState(false);
 
   useEffect(() => {
-    // fetch("/api/site-stats").then(r => r.json()).then(setStats);
+    api.siteStats().then(setStats).catch(() => {});
   }, []);
 
   return (

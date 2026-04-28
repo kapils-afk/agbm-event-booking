@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,19 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Search, Users } from "lucide-react";
 
-interface Member {
-  id: string;
-  name: string;
-  mobile: string;
-  email: string | null;
-  aadhaar: string | null;
-  address: string | null;
-  is_active: boolean;
-  created_at: string;
-}
-
 export default function AdminMembers() {
-  const [members, setMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -36,10 +25,7 @@ export default function AdminMembers() {
     fetchMembers();
   }, []);
 
-  const fetchMembers = async () => {
-    const { data } = await supabase.from("members").select("*").order("created_at", { ascending: false });
-    if (data) setMembers(data as Member[]);
-  };
+  const fetchMembers = () => api.getMembers().then(setMembers).catch(() => {});
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,34 +36,22 @@ export default function AdminMembers() {
     setLoading(true);
     try {
       if (editId) {
-        const updates: any = { name: form.name, mobile: form.mobile, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null };
-        if (form.password) updates.password_hash = form.password;
-        await supabase.from("members").update(updates).eq("id", editId);
-        toast({ title: "Updated", description: "Member updated successfully" });
+        await api.updateMember(editId, { name: form.name, mobile: form.mobile, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null, ...(form.password && { password: form.password }) });
+        toast({ title: "Updated" });
       } else {
-        await supabase.from("members").insert({ name: form.name, mobile: form.mobile, password_hash: form.password, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null });
-        toast({ title: "Added", description: "Member registered successfully" });
+        await api.createMember({ name: form.name, mobile: form.mobile, password: form.password, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null });
+        toast({ title: "Added" });
       }
-      setShowForm(false);
-      setEditId(null);
-      setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" });
+      setShowForm(false); setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" });
       fetchMembers();
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEdit = (m: Member) => {
-    setEditId(m.id);
-    setForm({ name: m.name, mobile: m.mobile, password: "", email: m.email || "", aadhaar: m.aadhaar || "", address: m.address || "" });
-    setShowForm(true);
+    } finally { setLoading(false); }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this member?")) return;
-    await supabase.from("members").delete().eq("id", id);
+    await api.deleteMember(id);
     toast({ title: "Deleted" });
     fetchMembers();
   };
@@ -90,63 +64,44 @@ export default function AdminMembers() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/admin"><Button variant="ghost" size="sm"><ArrowLeft size={14} /></Button></Link>
-            <div className="flex items-center gap-2">
-              <Users size={18} className="text-blue-500" />
-              <h1 className="font-bold text-foreground">Registered Members</h1>
-            </div>
+            <div className="flex items-center gap-2"><Users size={18} className="text-blue-500" /><h1 className="font-bold">Registered Members</h1></div>
           </div>
           <Button size="sm" onClick={() => { setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" }); setShowForm(true); }} className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
             <Plus size={14} className="mr-1" /> Add Member
           </Button>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="relative mb-4 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search by name or mobile..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
         </div>
-
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Mobile</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Aadhaar</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+        <Card><CardContent className="p-0">
+          <Table>
+            <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Mobile</TableHead><TableHead>Email</TableHead><TableHead>Aadhaar</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+            <TableBody>
+              {filtered.length === 0 ? (
+                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No members found</TableCell></TableRow>
+              ) : filtered.map(m => (
+                <TableRow key={m.id}>
+                  <TableCell className="font-medium">{m.name}</TableCell>
+                  <TableCell>{m.mobile}</TableCell>
+                  <TableCell>{m.email || "—"}</TableCell>
+                  <TableCell>{m.aadhaar || "—"}</TableCell>
+                  <TableCell><span className={`px-2 py-0.5 rounded-full text-xs ${m.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{m.is_active ? "Active" : "Inactive"}</span></TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" onClick={() => { setEditId(m.id); setForm({ name: m.name, mobile: m.mobile, password: "", email: m.email || "", aadhaar: m.aadhaar || "", address: m.address || "" }); setShowForm(true); }}><Edit size={14} /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)}><Trash2 size={14} className="text-destructive" /></Button>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No members found</TableCell></TableRow>
-                ) : filtered.map(m => (
-                  <TableRow key={m.id}>
-                    <TableCell className="font-medium">{m.name}</TableCell>
-                    <TableCell>{m.mobile}</TableCell>
-                    <TableCell>{m.email || "—"}</TableCell>
-                    <TableCell>{m.aadhaar || "—"}</TableCell>
-                    <TableCell><span className={`px-2 py-0.5 rounded-full text-xs ${m.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{m.is_active ? "Active" : "Inactive"}</span></TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(m)}><Edit size={14} /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)}><Trash2 size={14} className="text-destructive" /></Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent></Card>
       </main>
-
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{editId ? "Edit Member" : "Add New Member"}</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>{editId ? "Edit Member" : "Add New Member"}</DialogTitle></DialogHeader>
           <form onSubmit={handleSave} className="space-y-3">
             <div><Label>Name *</Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
             <div><Label>Mobile *</Label><Input type="tel" maxLength={10} value={form.mobile} onChange={e => setForm(f => ({ ...f, mobile: e.target.value }))} /></div>
@@ -154,9 +109,7 @@ export default function AdminMembers() {
             <div><Label>Email</Label><Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
             <div><Label>Aadhaar</Label><Input value={form.aadhaar} onChange={e => setForm(f => ({ ...f, aadhaar: e.target.value }))} /></div>
             <div><Label>Address</Label><Input value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} /></div>
-            <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white" disabled={loading}>
-              {loading ? "Saving..." : editId ? "Update Member" : "Register Member"}
-            </Button>
+            <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white" disabled={loading}>{loading ? "Saving..." : editId ? "Update Member" : "Register Member"}</Button>
           </form>
         </DialogContent>
       </Dialog>

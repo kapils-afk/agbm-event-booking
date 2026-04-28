@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,19 +25,15 @@ export default function AdminEvents() {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    const { data } = await supabase.from("events").select("*").order("event_date", { ascending: false });
-    if (data) setItems(data);
-  };
+  const fetchData = () => api.getEvents().then(setItems).catch(() => {});
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.event_date) { toast({ title: "Error", description: "Title and date required", variant: "destructive" }); return; }
     setLoading(true);
     try {
-      const payload = { title: form.title, description: form.description || null, event_date: form.event_date, venue: form.venue || null };
-      if (editId) await supabase.from("events").update(payload).eq("id", editId);
-      else await supabase.from("events").insert(payload);
+      if (editId) await api.updateEvent(editId, form);
+      else await api.createEvent(form);
       toast({ title: "Saved" }); setShowForm(false); setEditId(null); setForm({ title: "", description: "", event_date: "", venue: "" }); fetchData();
     } catch (err: any) { toast({ title: "Error", description: err.message, variant: "destructive" }); }
     finally { setLoading(false); }
@@ -45,7 +41,7 @@ export default function AdminEvents() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete?")) return;
-    await supabase.from("events").delete().eq("id", id);
+    await api.deleteEvent(id);
     toast({ title: "Deleted" }); fetchData();
   };
 

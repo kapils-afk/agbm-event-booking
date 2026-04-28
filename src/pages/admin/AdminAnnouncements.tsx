@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,35 +22,29 @@ export default function AdminAnnouncements() {
 
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) { navigate("/admin/login"); return; }
-    fetch();
+    fetchData();
   }, []);
 
-  const fetch = async () => {
-    const { data } = await supabase.from("announcements").select("*").order("created_at", { ascending: false });
-    if (data) setItems(data);
-  };
+  const fetchData = () => api.getAnnouncements().then(setItems).catch(() => {});
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.content) { toast({ title: "Error", description: "All fields required", variant: "destructive" }); return; }
     setLoading(true);
     try {
-      if (editId) {
-        await supabase.from("announcements").update(form).eq("id", editId);
-      } else {
-        await supabase.from("announcements").insert(form);
-      }
+      if (editId) await api.updateAnnouncement(editId, form);
+      else await api.createAnnouncement(form);
       toast({ title: "Saved" });
       setShowForm(false); setEditId(null); setForm({ title: "", content: "" });
-      fetch();
+      fetchData();
     } catch (err: any) { toast({ title: "Error", description: err.message, variant: "destructive" }); }
     finally { setLoading(false); }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete?")) return;
-    await supabase.from("announcements").delete().eq("id", id);
-    toast({ title: "Deleted" }); fetch();
+    await api.deleteAnnouncement(id);
+    toast({ title: "Deleted" }); fetchData();
   };
 
   return (

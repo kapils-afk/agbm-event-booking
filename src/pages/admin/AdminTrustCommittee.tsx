@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,7 @@ export default function AdminTrustCommittee() {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    const { data } = await supabase.from("trust_committee").select("*").order("display_order");
-    if (data) setItems(data);
-  };
+  const fetchData = () => api.getTrustCommittee().then(setItems).catch(() => {});
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +32,8 @@ export default function AdminTrustCommittee() {
     setLoading(true);
     try {
       const payload = { name: form.name, designation: form.designation, photo_url: form.photo_url || null, display_order: parseInt(form.display_order) || 0 };
-      if (editId) await supabase.from("trust_committee").update(payload).eq("id", editId);
-      else await supabase.from("trust_committee").insert(payload);
+      if (editId) await api.updateTrustCommitteeMember(editId, payload);
+      else await api.createTrustCommitteeMember(payload);
       toast({ title: "Saved" }); setShowForm(false); setEditId(null); setForm({ name: "", designation: "", photo_url: "", display_order: "0" }); fetchData();
     } catch (err: any) { toast({ title: "Error", description: err.message, variant: "destructive" }); }
     finally { setLoading(false); }
@@ -44,7 +41,7 @@ export default function AdminTrustCommittee() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete?")) return;
-    await supabase.from("trust_committee").delete().eq("id", id);
+    await api.deleteTrustCommitteeMember(id);
     toast({ title: "Deleted" }); fetchData();
   };
 

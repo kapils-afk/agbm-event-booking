@@ -1,3 +1,5 @@
+import { api } from "./api";
+
 export interface Booking {
   id: string;
   name: string;
@@ -26,38 +28,6 @@ export interface Booking {
 
 export type BookingStatus = "Upcoming" | "Ongoing" | "Completed";
 
-const STORAGE_KEY = "hall_bookings";
-
-export function getBookings(): Booking[] {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
-}
-
-export function saveBooking(booking: Booking): { success: boolean; conflict?: Booking } {
-  const bookings = getBookings();
-  const conflict = checkDoubleBooking(bookings, booking);
-  if (conflict) return { success: false, conflict };
-  bookings.push(booking);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-  return { success: true };
-}
-
-export function updateBooking(booking: Booking): { success: boolean; conflict?: Booking } {
-  const bookings = getBookings();
-  const others = bookings.filter((b) => b.id !== booking.id);
-  const conflict = checkDoubleBooking(others, booking);
-  if (conflict) return { success: false, conflict };
-  const idx = bookings.findIndex((b) => b.id === booking.id);
-  if (idx >= 0) bookings[idx] = booking;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-  return { success: true };
-}
-
-export function deleteBooking(id: string) {
-  const bookings = getBookings().filter((b) => b.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-}
-
 export function getBookingStatus(booking: Booking): BookingStatus {
   const now = new Date();
   const from = new Date(booking.fromDateTime);
@@ -67,19 +37,77 @@ export function getBookingStatus(booking: Booking): BookingStatus {
   return "Ongoing";
 }
 
-function checkDoubleBooking(existing: Booking[], newBooking: Booking): Booking | undefined {
-  const newFrom = new Date(newBooking.fromDateTime).getTime();
-  const newTo = new Date(newBooking.toDateTime).getTime();
-  return existing.find((b) => {
-    if (b.hallType !== newBooking.hallType) return false;
-    const bFrom = new Date(b.fromDateTime).getTime();
-    const bTo = new Date(b.toDateTime).getTime();
-    return newFrom < bTo && newTo > bFrom;
-  });
+function toApiPayload(booking: Booking) {
+  return {
+    id: booking.id,
+    name: booking.name,
+    address: booking.address,
+    occupation: booking.occupation,
+    phone: booking.phone,
+    alternate_phone: booking.alternatePhone ?? null,
+    proof_id_type: booking.proofIdType,
+    proof_id_number: booking.proofIdNumber,
+    advance_payment: booking.advancePayment ?? null,
+    tariff_amount: booking.tariffAmount ?? null,
+    function_type: booking.functionType,
+    function_name: booking.functionName,
+    purpose_description: booking.purposeDescription ?? null,
+    from_date_time: booking.fromDateTime,
+    to_date_time: booking.toDateTime,
+    allotted_slot: booking.allottedSlot,
+    hall_type: booking.hallType,
+    utility_charges: booking.utilityCharges,
+    receipt_number: booking.receiptNumber,
+    booking_date: booking.bookingDate,
+    terms_accepted: booking.termsAccepted,
+    signature: booking.signature,
+  };
+}
+
+// Kept for Dashboard (synchronous reads from cache)
+let _cache: Booking[] = [];
+
+export function getBookings(): Booking[] {
+  return _cache;
+}
+
+export async function loadBookings(): Promise<Booking[]> {
+  _cache = await api.getBookings();
+  return _cache;
+}
+
+export async function saveBooking(booking: Booking): Promise<{ success: boolean; conflict?: Booking }> {
+  try {
+    const saved = await api.createBooking(toApiPayload(booking));
+    _cache = [..._cache, saved];
+    return { success: true };
+  } catch (err: any) {
+    if (err.status === 409 && err.data?.conflict) {
+      return { success: false, conflict: err.data.conflict };
+    }
+    throw err;
+  }
+}
+
+export async function updateBooking(booking: Booking): Promise<{ success: boolean; conflict?: Booking }> {
+  try {
+    const updated = await api.updateBooking(booking.id, toApiPayload(booking));
+    _cache = _cache.map(b => b.id === booking.id ? updated : b);
+    return { success: true };
+  } catch (err: any) {
+    if (err.status === 409 && err.data?.conflict) {
+      return { success: false, conflict: err.data.conflict };
+    }
+    throw err;
+  }
+}
+
+export async function deleteBooking(id: string): Promise<void> {
+  await api.deleteBooking(id);
+  _cache = _cache.filter(b => b.id !== id);
 }
 
 export function generateBookingId(): string {
-  const bookings = getBookings();
-  const num = bookings.length + 1;
+  const num = _cache.length + 1;
   return `BK-${String(num).padStart(4, "0")}`;
 }

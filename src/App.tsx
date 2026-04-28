@@ -40,17 +40,13 @@ const App = () => (
           <Route path="/admin/office-bearers" element={<AdminOfficeBearers />} />
           <Route path="/admin/trust-committee" element={<AdminTrustCommittee />} />
 
-          {/* Booking system */}
-          <Route path="/booking/*" element={
-            <BookingLayout>
-              <Routes>
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="new" element={<NewBooking />} />
-                <Route path="manage" element={<BookingManagement />} />
-                <Route path=":id" element={<BookingEdit />} />
-              </Routes>
-            </BookingLayout>
-          } />
+          {/* Booking system - nested routes */}
+          <Route path="/booking" element={<BookingLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="new" element={<NewBooking />} />
+            <Route path="manage" element={<BookingManagement />} />
+            <Route path=":id" element={<BookingEdit />} />
+          </Route>
 
           <Route path="*" element={<NotFound />} />
         </Routes>

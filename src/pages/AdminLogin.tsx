@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Lock, LogIn, ArrowLeft, Shield } from "lucide-react";
 
@@ -21,27 +21,14 @@ export default function AdminLogin() {
       toast({ title: "Error", description: "Please enter mobile number and password", variant: "destructive" });
       return;
     }
-
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("admin_users")
-        .select("*")
-        .eq("mobile", mobile)
-        .eq("password_hash", password)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      if (data) {
-        localStorage.setItem("admin_session", JSON.stringify({ id: data.id, name: data.name, mobile: data.mobile, is_super_admin: data.is_super_admin }));
-        toast({ title: "Welcome Admin!", description: `Logged in as ${data.name}` });
-        navigate("/admin");
-      } else {
-        toast({ title: "Login Failed", description: "Invalid credentials", variant: "destructive" });
-      }
+      const data = await api.adminLogin(mobile, password);
+      localStorage.setItem("admin_session", JSON.stringify(data));
+      toast({ title: "Welcome Admin!", description: `Logged in as ${data.name}` });
+      navigate("/admin");
     } catch (err: any) {
-      toast({ title: "Error", description: err.message || "Login failed", variant: "destructive" });
+      toast({ title: "Login Failed", description: err.message || "Invalid credentials", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -67,29 +54,14 @@ export default function AdminLogin() {
                 <Label htmlFor="admin-mobile" className="text-slate-300">Mobile Number</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                  <Input
-                    id="admin-mobile"
-                    type="tel"
-                    placeholder="Enter admin mobile number"
-                    value={mobile}
-                    onChange={(e) => setMobile(e.target.value)}
-                    className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
-                    maxLength={10}
-                  />
+                  <Input id="admin-mobile" type="tel" placeholder="Enter admin mobile number" value={mobile} onChange={(e) => setMobile(e.target.value)} className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500" maxLength={10} />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="admin-password" className="text-slate-300">Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                  <Input
-                    id="admin-password"
-                    type="password"
-                    placeholder="Enter admin password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
-                  />
+                  <Input id="admin-password" type="password" placeholder="Enter admin password" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500" />
                 </div>
               </div>
               <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white" disabled={loading}>

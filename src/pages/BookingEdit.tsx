@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getBookings, updateBooking, type Booking } from "@/lib/bookingStore";
+import { loadBookings, updateBooking, type Booking } from "@/lib/bookingStore";
 import { generateBookingPDF } from "@/lib/pdfGenerator";
 import { toast } from "sonner";
 
@@ -27,23 +27,21 @@ export default function BookingEdit() {
   const navigate = useNavigate();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState<any>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const booking = getBookings().find((b) => b.id === id);
-    if (!booking) { toast.error("Booking not found"); navigate("/booking/manage"); return; }
-    setForm({
-      ...booking,
-      advancePayment: booking.advancePayment?.toString() || "",
-      tariffAmount: booking.tariffAmount?.toString() || "",
-      utilityCharges: booking.utilityCharges.toString(),
-    });
+    loadBookings().then(bookings => {
+      const booking = bookings.find(b => b.id === id);
+      if (!booking) { toast.error("Booking not found"); navigate("/booking/manage"); return; }
+      setForm({ ...booking, advancePayment: booking.advancePayment?.toString() || "", tariffAmount: booking.tariffAmount?.toString() || "", utilityCharges: booking.utilityCharges.toString() });
+    }).catch(() => { toast.error("Failed to load booking"); navigate("/booking/manage"); });
   }, [id]);
 
   if (!form) return null;
 
   const set = (key: string, value: string | boolean) => {
     setForm((p: any) => ({ ...p, [key]: value }));
-    setErrors((p) => { const n = { ...p }; delete n[key]; return n; });
+    setErrors(p => { const n = { ...p }; delete n[key]; return n; });
   };
 
   const validate = () => {
@@ -72,30 +70,22 @@ export default function BookingEdit() {
     return Object.keys(e).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validate()) { toast.error("Please fix the errors"); return; }
-    const booking: Booking = {
-      ...form,
-      advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined,
-      tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
-      utilityCharges: Number(form.utilityCharges),
-    };
-    const result = updateBooking(booking);
-    if (!result.success) {
-      toast.error(`Conflict with ${result.conflict?.name} (${result.conflict?.id})`);
-      return;
-    }
-    toast.success("Booking updated");
-    navigate("/booking/manage");
+    setSubmitting(true);
+    try {
+      const booking: Booking = { ...form, advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined, tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined, utilityCharges: Number(form.utilityCharges) };
+      const result = await updateBooking(booking);
+      if (!result.success) { toast.error(`Conflict with ${result.conflict?.name} (${result.conflict?.id})`); return; }
+      toast.success("Booking updated");
+      navigate("/booking/manage");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update booking");
+    } finally { setSubmitting(false); }
   };
 
   const handleDownloadPDF = () => {
-    const booking: Booking = {
-      ...form,
-      advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined,
-      tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
-      utilityCharges: Number(form.utilityCharges),
-    };
+    const booking: Booking = { ...form, advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined, tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined, utilityCharges: Number(form.utilityCharges) };
     generateBookingPDF(booking);
   };
 
@@ -103,9 +93,9 @@ export default function BookingEdit() {
     <div className="space-y-1.5">
       <Label className="text-sm font-medium">{label} {required && <span className="text-destructive">*</span>}</Label>
       {type === "textarea" ? (
-        <Textarea value={form[field] || ""} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
+        <Textarea value={form[field] || ""} onChange={e => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
       ) : (
-        <Input type={type} value={form[field] || ""} onChange={(e) => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
+        <Input type={type} value={form[field] || ""} onChange={e => set(field, e.target.value)} placeholder={placeholder} className={errors[field] ? "border-destructive" : ""} />
       )}
       {errors[field] && <p className="text-xs text-destructive">{errors[field]}</p>}
     </div>
@@ -125,9 +115,9 @@ export default function BookingEdit() {
           {renderField("Alternate Phone", "alternatePhone", "text", false)}
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">Proof ID Type <span className="text-destructive">*</span></Label>
-            <Select value={form.proofIdType} onValueChange={(v) => { set("proofIdType", v); set("proofIdNumber", ""); }}>
+            <Select value={form.proofIdType} onValueChange={v => { set("proofIdType", v); set("proofIdNumber", ""); }}>
               <SelectTrigger className={errors.proofIdType ? "border-destructive" : ""}><SelectValue /></SelectTrigger>
-              <SelectContent>{proofIdTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              <SelectContent>{proofIdTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
             {errors.proofIdType && <p className="text-xs text-destructive">{errors.proofIdType}</p>}
           </div>
@@ -142,9 +132,9 @@ export default function BookingEdit() {
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">Function Type <span className="text-destructive">*</span></Label>
-            <Select value={form.functionType} onValueChange={(v) => set("functionType", v)}>
+            <Select value={form.functionType} onValueChange={v => set("functionType", v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{functionTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              <SelectContent>{functionTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           {renderField("Function Name", "functionName")}
@@ -154,7 +144,7 @@ export default function BookingEdit() {
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">Allotted Slot <span className="text-destructive">*</span></Label>
             <div className="flex gap-4 pt-1">
-              {["AM", "PM"].map((s) => (
+              {["AM", "PM"].map(s => (
                 <label key={s} className="flex items-center gap-2 cursor-pointer">
                   <input type="radio" name="slot" checked={form.allottedSlot === s} onChange={() => set("allottedSlot", s)} className="accent-primary" /><span className="text-sm">{s}</span>
                 </label>
@@ -165,7 +155,7 @@ export default function BookingEdit() {
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">Hall Type <span className="text-destructive">*</span></Label>
             <div className="flex gap-4 pt-1">
-              {["Single", "Double"].map((h) => (
+              {["Single", "Double"].map(h => (
                 <label key={h} className="flex items-center gap-2 cursor-pointer">
                   <input type="radio" name="hall" checked={form.hallType === h} onChange={() => set("hallType", h)} className="accent-primary" /><span className="text-sm">{h}</span>
                 </label>
@@ -183,7 +173,7 @@ export default function BookingEdit() {
         <CardHeader><CardTitle className="text-base">Declaration</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-start gap-2">
-            <Checkbox checked={form.termsAccepted} onCheckedChange={(v) => set("termsAccepted", !!v)} id="terms" />
+            <Checkbox checked={form.termsAccepted} onCheckedChange={v => set("termsAccepted", !!v)} id="terms" />
             <Label htmlFor="terms" className="text-sm cursor-pointer">I accept the Terms & Conditions</Label>
           </div>
           {renderField("Digital Signature", "signature")}
@@ -193,7 +183,7 @@ export default function BookingEdit() {
       <div className="flex justify-end gap-3">
         <Button variant="outline" onClick={() => navigate("/booking/manage")}>Cancel</Button>
         <Button variant="outline" onClick={handleDownloadPDF}>Download PDF</Button>
-        <Button onClick={handleSave}>Save Changes</Button>
+        <Button onClick={handleSave} disabled={submitting}>{submitting ? "Saving..." : "Save Changes"}</Button>
       </div>
     </div>
   );
