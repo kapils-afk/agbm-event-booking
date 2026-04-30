@@ -12,6 +12,12 @@ import { generateBookingPDF } from "@/lib/pdfGenerator";
 import { toast } from "sonner";
 
 const proofIdTypes = ["Aadhaar", "PAN", "Driving License"] as const;
+type ProofType = typeof proofIdTypes[number];
+const hallOptions = ["Mini Hall", "Convention Hall", "Rooms", "Dining Hall"] as const;
+type HallOption = typeof hallOptions[number];
+const MAX_REGULAR_ROOMS = 14;
+const MAX_DELUXE_ROOMS = 2;
+
 const functionTypes = ["Marriage", "Reception", "Other"];
 const timeOptions = Array.from({ length: 48 }, (_, index) => {
   const hour = Math.floor(index / 2);
@@ -33,7 +39,7 @@ function getProofIdPlaceholder(type: string) {
   if (type === "Aadhaar") return "Enter 12-digit Aadhaar number";
   if (type === "PAN") return "Enter PAN (e.g., AAAAA9999A)";
   if (type === "Driving License") return "Enter Driving License number";
-  return "Select ID type first";
+  return "";
 }
 function combineDateTime(date: string, time: string) { return date && time ? `${date}T${time}` : ""; }
 
@@ -41,11 +47,17 @@ export default function NewBooking() {
   const navigate = useNavigate();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [proofTypes, setProofTypes] = useState<ProofType[]>([]);
+  const [proofValues, setProofValues] = useState<Record<ProofType, string>>({ Aadhaar: "", PAN: "", "Driving License": "" });
+  const [halls, setHalls] = useState<HallOption[]>([]);
+  const [regularRooms, setRegularRooms] = useState("");
+  const [deluxeRooms, setDeluxeRooms] = useState("");
+
   const [form, setForm] = useState({
     name: "", address: "", occupation: "", phone: "", alternatePhone: "",
-    proofIdType: "" as string, proofIdNumber: "", advancePayment: "", tariffAmount: "",
+    advancePayment: "", tariffAmount: "",
     functionType: "", purposeDescription: "",
-    fromDate: "", fromTime: "", toDate: "", toTime: "", allottedSlot: "" as string, hallType: "" as string,
+    fromDate: "", fromTime: "", toDate: "", toTime: "", allottedSlot: "" as string,
     utilityCharges: "", receiptNumber: "", bookingDate: "",
     termsAccepted: false, signature: "", functionName: "",
   });
@@ -53,6 +65,15 @@ export default function NewBooking() {
   const set = (key: string, value: string | boolean, errorKeys: string[] = [key]) => {
     setForm(p => ({ ...p, [key]: value }));
     setErrors(p => { const n = { ...p }; errorKeys.forEach(k => delete n[k]); return n; });
+  };
+
+  const toggleProof = (t: ProofType) => {
+    setProofTypes(prev => prev.includes(t) ? prev.filter(p => p !== t) : [...prev, t]);
+    setErrors(p => { const n = { ...p }; delete n.proofIdType; delete n[`proof_${t}`]; return n; });
+  };
+  const toggleHall = (h: HallOption) => {
+    setHalls(prev => prev.includes(h) ? prev.filter(x => x !== h) : [...prev, h]);
+    setErrors(p => { const n = { ...p }; delete n.hallType; return n; });
   };
 
   const validate = () => {
@@ -64,15 +85,25 @@ export default function NewBooking() {
     if (!form.occupation.trim()) e.occupation = "Required";
     if (!validatePhone(form.phone)) e.phone = "Valid 10-digit number required";
     if (form.alternatePhone && !validatePhone(form.alternatePhone)) e.alternatePhone = "Valid 10-digit number required";
-    if (!form.proofIdType) e.proofIdType = "Required";
-    if (!form.proofIdNumber) e.proofIdNumber = "Required";
-    else if (form.proofIdType && !validateProofId(form.proofIdType, form.proofIdNumber)) e.proofIdNumber = `Invalid ${form.proofIdType} format`;
+    if (proofTypes.length === 0) e.proofIdType = "Select at least one";
+    proofTypes.forEach(t => {
+      const v = proofValues[t];
+      if (!v) e[`proof_${t}`] = "Required";
+      else if (!validateProofId(t, v)) e[`proof_${t}`] = `Invalid ${t} format`;
+    });
     if (!form.functionType) e.functionType = "Required";
     if (!fromDateTime) e.fromDateTime = "Required";
     if (!toDateTime) e.toDateTime = "Required";
     if (fromDateTime && toDateTime && new Date(fromDateTime) >= new Date(toDateTime)) e.toDateTime = "Must be after From date";
     if (!form.allottedSlot) e.allottedSlot = "Required";
-    if (!form.hallType) e.hallType = "Required";
+    if (halls.length === 0) e.hallType = "Select at least one";
+    if (halls.includes("Rooms")) {
+      const reg = Number(regularRooms || 0);
+      const dlx = Number(deluxeRooms || 0);
+      if (reg + dlx <= 0) e.rooms = "Enter at least one room";
+      if (reg < 0 || reg > MAX_REGULAR_ROOMS) e.rooms = `Regular rooms 0-${MAX_REGULAR_ROOMS}`;
+      if (dlx < 0 || dlx > MAX_DELUXE_ROOMS) e.rooms = `Deluxe rooms 0-${MAX_DELUXE_ROOMS}`;
+    }
     if (!form.utilityCharges || Number(form.utilityCharges) <= 0) e.utilityCharges = "Required";
     if (!form.receiptNumber.trim()) e.receiptNumber = "Required";
     if (!form.bookingDate) e.bookingDate = "Required";
@@ -89,19 +120,28 @@ export default function NewBooking() {
     try {
       const fromDateTime = combineDateTime(form.fromDate, form.fromTime);
       const toDateTime = combineDateTime(form.toDate, form.toTime);
+      const proofIdType = proofTypes.join(", ");
+      const proofIdNumber = proofTypes.map(t => `${t}: ${proofValues[t]}`).join(" | ");
+      const hallType = halls.join(", ");
+      let purpose = form.purposeDescription || "";
+      if (halls.includes("Rooms")) {
+        const parts: string[] = [];
+        if (Number(regularRooms) > 0) parts.push(`Regular AC Rooms: ${regularRooms}`);
+        if (Number(deluxeRooms) > 0) parts.push(`Deluxe AC Rooms: ${deluxeRooms}`);
+        if (parts.length) purpose = `${purpose ? purpose + "\n" : ""}${parts.join(", ")}`;
+      }
       const booking: Booking = {
         id: generateBookingId(),
         name: form.name, address: form.address, occupation: form.occupation,
         phone: form.phone, alternatePhone: form.alternatePhone || undefined,
-        proofIdType: form.proofIdType as Booking["proofIdType"],
-        proofIdNumber: form.proofIdNumber,
+        proofIdType, proofIdNumber,
         advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined,
         tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
         functionType: form.functionType,
-        purposeDescription: form.purposeDescription || undefined,
+        purposeDescription: purpose || undefined,
         fromDateTime, toDateTime,
         allottedSlot: form.allottedSlot as Booking["allottedSlot"],
-        hallType: form.hallType as Booking["hallType"],
+        hallType,
         utilityCharges: Number(form.utilityCharges),
         receiptNumber: form.receiptNumber,
         bookingDate: form.bookingDate,
@@ -163,15 +203,39 @@ export default function NewBooking() {
           <div className="md:col-span-2">{renderField("Address", "address", "textarea", true, "Full address")}</div>
           {renderField("Phone / Mobile", "phone", "text", true, "10-digit number")}
           {renderField("Alternate Phone", "alternatePhone", "text", false, "Optional")}
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Proof ID Type <span className="text-destructive">*</span></Label>
-            <Select value={form.proofIdType} onValueChange={v => { set("proofIdType", v); set("proofIdNumber", ""); }}>
-              <SelectTrigger className={errors.proofIdType ? "border-destructive" : ""}><SelectValue placeholder="Select ID type" /></SelectTrigger>
-              <SelectContent>{proofIdTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-            </Select>
+
+          <div className="md:col-span-2 space-y-2">
+            <Label className="text-sm font-medium">Proof ID Type <span className="text-destructive">*</span> <span className="text-xs text-muted-foreground font-normal">(select one or more)</span></Label>
+            <div className="flex flex-wrap gap-4 pt-1">
+              {proofIdTypes.map(t => (
+                <label key={t} className="flex items-center gap-2 cursor-pointer">
+                  <Checkbox checked={proofTypes.includes(t)} onCheckedChange={() => toggleProof(t)} />
+                  <span className="text-sm">{t}</span>
+                </label>
+              ))}
+            </div>
             {errors.proofIdType && <p className="text-xs text-destructive">{errors.proofIdType}</p>}
+            {proofTypes.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                {proofTypes.map(t => (
+                  <div key={t} className="space-y-1.5">
+                    <Label className="text-xs font-medium">{t} Number <span className="text-destructive">*</span></Label>
+                    <Input
+                      value={proofValues[t]}
+                      onChange={e => {
+                        setProofValues(p => ({ ...p, [t]: e.target.value }));
+                        setErrors(p => { const n = { ...p }; delete n[`proof_${t}`]; return n; });
+                      }}
+                      placeholder={getProofIdPlaceholder(t)}
+                      className={errors[`proof_${t}`] ? "border-destructive" : ""}
+                    />
+                    {errors[`proof_${t}`] && <p className="text-xs text-destructive">{errors[`proof_${t}`]}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          {renderField(form.proofIdType ? `${form.proofIdType} Number` : "Proof ID Number", "proofIdNumber", "text", true, getProofIdPlaceholder(form.proofIdType))}
+
           {renderField("Tariff Amount (Rs)", "tariffAmount", "number", false, "Optional")}
           {renderField("Advance Payment (Rs)", "advancePayment", "number", false, "Optional")}
         </CardContent>
@@ -203,17 +267,38 @@ export default function NewBooking() {
             </div>
             {errors.allottedSlot && <p className="text-xs text-destructive">{errors.allottedSlot}</p>}
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Hall Type <span className="text-destructive">*</span></Label>
-            <div className="flex gap-4 pt-1">
-              {["Single", "Double"].map(h => (
+
+          <div className="md:col-span-2 space-y-2">
+            <Label className="text-sm font-medium">Hall / Facility <span className="text-destructive">*</span> <span className="text-xs text-muted-foreground font-normal">(select one or more)</span></Label>
+            <div className="flex flex-wrap gap-4 pt-1">
+              {hallOptions.map(h => (
                 <label key={h} className="flex items-center gap-2 cursor-pointer">
-                  <input type="radio" name="hall" checked={form.hallType === h} onChange={() => set("hallType", h)} className="accent-primary" /><span className="text-sm">{h}</span>
+                  <Checkbox checked={halls.includes(h)} onCheckedChange={() => toggleHall(h)} />
+                  <span className="text-sm">{h}</span>
                 </label>
               ))}
             </div>
             {errors.hallType && <p className="text-xs text-destructive">{errors.hallType}</p>}
+
+            {halls.includes("Rooms") && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 p-3 rounded-md bg-muted/40">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium">Regular AC Rooms (max {MAX_REGULAR_ROOMS})</Label>
+                  <Input type="number" min={0} max={MAX_REGULAR_ROOMS} value={regularRooms}
+                    onChange={e => { setRegularRooms(e.target.value); setErrors(p => { const n = { ...p }; delete n.rooms; return n; }); }}
+                    placeholder="0" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium">Deluxe AC Rooms (max {MAX_DELUXE_ROOMS})</Label>
+                  <Input type="number" min={0} max={MAX_DELUXE_ROOMS} value={deluxeRooms}
+                    onChange={e => { setDeluxeRooms(e.target.value); setErrors(p => { const n = { ...p }; delete n.rooms; return n; }); }}
+                    placeholder="0" />
+                </div>
+                {errors.rooms && <p className="md:col-span-2 text-xs text-destructive">{errors.rooms}</p>}
+              </div>
+            )}
           </div>
+
           {renderField("Utility Charges (Rs)", "utilityCharges", "number", true, "Amount")}
           {renderField("Receipt Number", "receiptNumber", "text", true, "Receipt #")}
           {renderField("Booking Date", "bookingDate", "date")}
