@@ -21,6 +21,7 @@ import AdminTrustCommittee from "@/pages/admin/AdminTrustCommittee";
 import AdminTrustDashboard from "@/pages/admin/AdminTrustDashboard";
 import AdminTrustList from "@/pages/admin/AdminTrustList";
 import AdminTrustEntry from "@/pages/admin/AdminTrustEntry";
+import AdminEnquiries from "@/pages/admin/AdminEnquiries";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
