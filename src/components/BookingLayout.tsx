@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { LayoutDashboard, Plus, List, Menu, X, Home, Shield } from "lucide-react";
+import { LayoutDashboard, Plus, List, ArrowLeft, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { to: "/booking/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -8,105 +8,63 @@ const navItems = [
   { to: "/booking/manage", label: "Manage Bookings", icon: List },
 ];
 
-export default function BookingLayout(/* children are provided by nested routes via Outlet */) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+export default function BookingLayout() {
   const location = useLocation();
 
   return (
-    <div className="flex min-h-screen">
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-sidebar text-sidebar-foreground shrink-0">
-        <div className="p-5 border-b border-sidebar-border">
-          <h1 className="text-lg font-bold text-sidebar-primary">Adi Goud Bhawan</h1>
-          <p className="text-xs opacity-70 mt-0.5">Hall Booking System</p>
+    <div className="min-h-screen bg-slate-50">
+      <header className="bg-white border-b shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link to="/admin">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft size={14} className="mr-1" /> Back
+              </Button>
+            </Link>
+            <div className="flex items-center gap-2 min-w-0">
+              <BookOpen size={20} className="text-orange-600" />
+              <h1 className="font-bold truncate">Hall Booking System</h1>
+            </div>
+          </div>
+          <nav className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => {
+              const active = location.pathname === item.to;
+              return (
+                <Link key={item.to} to={item.to}>
+                  <Button
+                    variant={active ? "default" : "ghost"}
+                    size="sm"
+                    className={active ? "bg-gradient-to-r from-orange-500 to-red-500 text-white" : ""}
+                  >
+                    <item.icon size={14} className="mr-1" />
+                    {item.label}
+                  </Button>
+                </Link>
+              );
+            })}
+          </nav>
         </div>
-        <nav className="flex-1 p-3 space-y-1">
+        {/* Mobile nav */}
+        <nav className="md:hidden border-t flex overflow-x-auto px-2 py-2 gap-1">
           {navItems.map((item) => {
             const active = location.pathname === item.to;
             return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                  active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
-                }`}
-              >
-                <item.icon size={18} />
-                {item.label}
+              <Link key={item.to} to={item.to} className="shrink-0">
+                <Button
+                  variant={active ? "default" : "ghost"}
+                  size="sm"
+                  className={active ? "bg-gradient-to-r from-orange-500 to-red-500 text-white" : ""}
+                >
+                  <item.icon size={14} className="mr-1" />
+                  {item.label}
+                </Button>
               </Link>
             );
           })}
         </nav>
-        <div className="p-3 border-t border-sidebar-border space-y-1">
-          <Link
-            to="/admin"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors"
-          >
-            <Shield size={18} /> Admin Panel
-          </Link>
-          <Link
-            to="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors"
-          >
-            <Home size={18} /> Back to Home
-          </Link>
-        </div>
-      </aside>
+      </header>
 
-      {/* Mobile header */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-sidebar text-sidebar-foreground">
-          <h1 className="text-base font-bold text-sidebar-primary">Adi Goud Bhawan</h1>
-          <button onClick={() => setMobileOpen(!mobileOpen)}>
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </header>
-
-        {mobileOpen && (
-          <div className="md:hidden fixed inset-0 z-50" onClick={() => setMobileOpen(false)}>
-            <div className="absolute inset-0 bg-foreground/30" />
-            <nav
-              className="absolute top-0 left-0 w-64 h-full bg-sidebar text-sidebar-foreground p-4 space-y-1 pt-16"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {navItems.map((item) => {
-                const active = location.pathname === item.to;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                      active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
-                    }`}
-                  >
-                    <item.icon size={18} />
-                    {item.label}
-                  </Link>
-                );
-              })}
-              <div className="mt-4 border-t border-sidebar-border pt-4 space-y-1">
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors"
-                >
-                  <Shield size={18} /> Admin Panel
-                </Link>
-                <Link
-                  to="/"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-sidebar-accent/50 transition-colors"
-                >
-                  <Home size={18} /> Back to Home
-                </Link>
-              </div>
-            </nav>
-          </div>
-        )}
-
-        <main className="flex-1 overflow-auto"><Outlet /></main>
-      </div>
+      <main><Outlet /></main>
     </div>
   );
 }
