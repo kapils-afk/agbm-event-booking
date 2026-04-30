@@ -429,8 +429,8 @@ export default function HomePage() {
             <h3 className="font-semibold text-white text-sm mb-3">Contact Us</h3>
             <div className="space-y-2 text-xs">
               <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" /><span>417, Vegetarian Village, Puzhal, Chennai, Tamil Nadu 600060</span></div>
-              <div className="flex items-center gap-2"><Phone size={14} className="shrink-0 text-orange-400" /><span>+91 7603961126</span></div>
-              <div className="flex items-center gap-2"><Mail size={14} className="shrink-0 text-orange-400" /><span>agbm.chennai@gmail.com</span></div>
+              <div className="flex items-center gap-2"><Phone size={14} className="shrink-0 text-orange-400" /><span>+91 7603951126, +91 9444412706</span></div>
+              <div className="flex items-center gap-2"><Mail size={14} className="shrink-0 text-orange-400" /><span>adigoudtrust@gmail.com</span></div>
             </div>
           </div>
 
