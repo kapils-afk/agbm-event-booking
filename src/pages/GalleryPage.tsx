@@ -4,7 +4,7 @@ import { ArrowLeft, Shield, Image as ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 interface GalleryItem {
   id: string;
@@ -29,10 +29,9 @@ export default function GalleryPage() {
   const [preview, setPreview] = useState<GalleryItem | null>(null);
 
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.from("gallery").select("*").eq("is_active", true).order("created_at", { ascending: false });
-      if (data && data.length > 0) setItems(data as GalleryItem[]);
-    })();
+    api.getGallery().then((data: GalleryItem[]) => {
+      if (data?.length) setItems(data);
+    }).catch(() => {});
   }, []);
 
   const grouped = items.reduce<Record<string, GalleryItem[]>>((acc, it) => {

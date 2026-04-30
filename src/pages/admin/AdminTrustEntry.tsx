@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,16 +15,8 @@ const PURPOSES = ["Membership Fee", "Subscription", "Donation", "Corpus Fund"];
 const METHODS = ["Cash", "Cheque", "NEFT", "RTGS", "UPI"];
 
 async function nextReceiptNo(): Promise<string> {
-  const year = new Date().getFullYear();
-  const prefix = `AGBM/${year}/`;
-  const { data } = await supabase.from("donations").select("receipt_no")
-    .ilike("receipt_no", `${prefix}%`).order("receipt_no", { ascending: false }).limit(1);
-  let next = 1;
-  if (data && data.length) {
-    const last = data[0].receipt_no.split("/").pop();
-    next = (parseInt(last || "0") || 0) + 1;
-  }
-  return `${prefix}${String(next).padStart(4, "0")}`;
+  const { receipt_no } = await api.getNextReceiptNo();
+  return receipt_no;
 }
 
 export default function AdminTrustEntry() {
@@ -50,7 +42,7 @@ export default function AdminTrustEntry() {
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) { navigate("/admin/login"); return; }
     if (id) {
-      supabase.from("donations").select("*").eq("id", id).single().then(({ data }) => {
+      api.getDonation(id).then((data) => {
         if (data) setForm({
           receipt_no: data.receipt_no, donation_date: data.donation_date,
           donor_name: data.donor_name, mobile: data.mobile || "", pan: data.pan || "",
@@ -97,8 +89,8 @@ export default function AdminTrustEntry() {
         collected_by: form.collected_by || null,
         notes: form.notes || null,
       };
-      if (id) await supabase.from("donations").update(payload).eq("id", id);
-      else await supabase.from("donations").insert(payload);
+      if (id) await api.updateDonation(id, payload);
+      else await api.createDonation(payload);
       toast({ title: "Saved", description: `Receipt ${form.receipt_no} saved` });
       navigate("/admin/trust/list");
     } catch (err: any) {

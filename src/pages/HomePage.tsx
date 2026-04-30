@@ -20,6 +20,19 @@ interface SiteStats {
   yearsOfService: number;
 }
 
+interface ForumPost {
+  id: string;
+  name: string;
+  message: string;
+  created_at: string;
+}
+
+interface GalleryItem {
+  id: string;
+  image_url: string;
+  title: string;
+}
+
 interface EventItem {
   id: string;
   title: string;
@@ -74,6 +87,7 @@ const defaultEvents: EventItem[] = [
 export default function HomePage() {
   const [stats] = useState<SiteStats>(defaultStats);
   const [events, setEvents] = useState<EventItem[]>(defaultEvents);
+  const [gallery, setGallery] = useState<{ url: string; title: string }[]>(defaultGallery);
   const [galleryApi, setGalleryApi] = useState<CarouselApi | undefined>();
   const [preview, setPreview] = useState<{ url: string; title: string } | null>(null);
   const autoplayRef = useRef<number | null>(null);
@@ -83,15 +97,20 @@ export default function HomePage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Forum posts (local demo)
-  const [forumPosts, setForumPosts] = useState<{ id: string; name: string; message: string; at: string }[]>([
-    { id: "f1", name: "Ramesh Goud", message: "Looking forward to the Annual Cultural Festival! Who else is attending?", at: new Date(Date.now() - 3600000).toISOString() },
-    { id: "f2", name: "Priya S.", message: "Thank you to the trust for the wonderful wedding arrangements last week.", at: new Date(Date.now() - 86400000).toISOString() },
-  ]);
+  const [forumPosts, setForumPosts] = useState<ForumPost[]>([]);
   const [forumInput, setForumInput] = useState({ name: "", message: "" });
 
   useEffect(() => {
     // api.siteStats().then(setStats).catch(() => {});
+    api.getGallery().then((data: GalleryItem[]) => {
+      if (data?.length) setGallery(data.map((g) => ({ url: g.image_url, title: g.title })));
+    }).catch(() => {});
+    api.getEvents().then((data: EventItem[]) => {
+      if (data?.length) setEvents(data);
+    }).catch(() => {});
+    api.getForumPosts().then((data: ForumPost[]) => {
+      if (data?.length) setForumPosts(data);
+    }).catch(() => {});
   }, []);
 
   // Autoplay carousel
@@ -114,23 +133,26 @@ export default function HomePage() {
     }
     setSubmitting(true);
     try {
-      // Store as announcement-style note is not ideal; just simulate success.
-      await new Promise((r) => setTimeout(r, 600));
+      await api.submitEnquiry({ name: form.name, email: form.email, mobile: form.mobile, message: form.message });
       setSubmitted(true);
       setForm({ name: "", email: "", mobile: "", message: "" });
+    } catch {
+      toast({ title: "Failed to send message. Please try again.", variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleForumPost = (e: React.FormEvent) => {
+  const handleForumPost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forumInput.name.trim() || !forumInput.message.trim()) return;
-    setForumPosts((prev) => [
-      { id: crypto.randomUUID(), name: forumInput.name, message: forumInput.message, at: new Date().toISOString() },
-      ...prev,
-    ]);
-    setForumInput({ name: "", message: "" });
+    try {
+      const post = await api.createForumPost({ name: forumInput.name, message: forumInput.message });
+      setForumPosts((prev) => [post, ...prev]);
+      setForumInput({ name: "", message: "" });
+    } catch {
+      toast({ title: "Failed to post message", variant: "destructive" });
+    }
   };
 
   return (
@@ -232,7 +254,7 @@ export default function HomePage() {
           </div>
           <Carousel setApi={setGalleryApi} opts={{ loop: true, align: "start" }} className="px-10">
             <CarouselContent>
-              {defaultGallery.map((g, i) => (
+              {gallery.map((g, i) => (
                 <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/3">
                   <button
                     type="button"
@@ -295,7 +317,7 @@ export default function HomePage() {
               <Card key={ev.id} className="overflow-hidden hover:shadow-xl transition-shadow">
                 <div className="aspect-video overflow-hidden bg-muted">
                   <img
-                    src={ev.image_url || defaultEvents[i % defaultEvents.length].image_url || ""}
+                    src={ev.image_url || ""}
                     alt={ev.title}
                     className="w-full h-full object-cover"
                   />
@@ -370,7 +392,7 @@ export default function HomePage() {
                     <div key={p.id} className="border border-border rounded-lg p-3 bg-orange-50/30">
                       <div className="flex items-center justify-between mb-1">
                         <p className="font-semibold text-sm text-foreground">{p.name}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(p.at).toLocaleString("en-IN")}</p>
+                        <p className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleString("en-IN")}</p>
                       </div>
                       <p className="text-sm text-muted-foreground">{p.message}</p>
                     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, List, IndianRupee, Trophy, HeartHandshake } from "lucide-react";
@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, List, IndianRupee, Trophy, HeartHandshake } from "luci
 export default function AdminTrustDashboard() {
   const [total, setTotal] = useState(0);
   const [count, setCount] = useState(0);
+  const [uniqueDonors, setUniqueDonors] = useState(0);
   const [topDonors, setTopDonors] = useState<{ donor_name: string; total: number }[]>([]);
   const navigate = useNavigate();
 
@@ -17,18 +18,11 @@ export default function AdminTrustDashboard() {
   }, []);
 
   const fetchData = async () => {
-    const { data } = await supabase.from("donations").select("donor_name, amount");
-    if (data) {
-      setCount(data.length);
-      setTotal(data.reduce((s, d: any) => s + Number(d.amount || 0), 0));
-      const map = new Map<string, number>();
-      data.forEach((d: any) => map.set(d.donor_name, (map.get(d.donor_name) || 0) + Number(d.amount || 0)));
-      const top = Array.from(map.entries())
-        .map(([donor_name, total]) => ({ donor_name, total }))
-        .sort((a, b) => b.total - a.total)
-        .slice(0, 5);
-      setTopDonors(top);
-    }
+    const stats = await api.getDonationStats();
+    setCount(stats.count);
+    setTotal(stats.total);
+    setUniqueDonors(stats.uniqueDonors);
+    setTopDonors(stats.topDonors);
   };
 
   return (
@@ -89,7 +83,7 @@ export default function AdminTrustDashboard() {
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Unique Donors</CardTitle></CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-600">{new Set(topDonors.map(t => t.donor_name)).size + Math.max(0, count - topDonors.length)}</div>
+              <div className="text-3xl font-bold text-purple-600">{uniqueDonors}</div>
               <p className="text-xs text-muted-foreground mt-1">Distinct contributors</p>
             </CardContent>
           </Card>

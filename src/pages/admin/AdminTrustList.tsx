@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,8 +25,8 @@ export default function AdminTrustList() {
   }, []);
 
   const fetchData = async () => {
-    const { data } = await supabase.from("donations").select("*").order("donation_date", { ascending: false });
-    if (data) setItems(data);
+    const data = await api.getDonations();
+    setItems(data);
   };
 
   const { filtered, paged, total } = useMemo(
@@ -40,7 +40,7 @@ export default function AdminTrustList() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this donation entry?")) return;
-    await supabase.from("donations").delete().eq("id", id);
+    await api.deleteDonation(id);
     toast({ title: "Deleted" });
     fetchData();
   };

@@ -73,4 +73,24 @@ export const api = {
   createBooking: (data: any) => post<any>('/bookings', data),
   updateBooking: (id: string, data: any) => put<any>(`/bookings/${id}`, data),
   deleteBooking: (id: string) => del(`/bookings/${id}`),
+
+  // Contact Enquiries
+  submitEnquiry: (data: { name: string; email?: string; mobile?: string; message: string }) =>
+    post<any>('/contact-enquiries', data),
+  getEnquiries: () => get<any[]>('/contact-enquiries'),
+  markEnquiryRead: (id: string) => request<any>('PATCH', `/contact-enquiries/${id}/mark-read`),
+  deleteEnquiry: (id: string) => del(`/contact-enquiries/${id}`),
+
+  // Forum
+  getForumPosts: () => get<any[]>('/forum-posts'),
+  createForumPost: (data: { name: string; message: string }) => post<any>('/forum-posts', data),
+
+  // Donations (Trust)
+  getDonations: () => get<any[]>('/donations'),
+  getDonation: (id: string) => get<any>(`/donations/${id}`),
+  getDonationStats: () => get<{ total: number; count: number; uniqueDonors: number; topDonors: { donor_name: string; total: number }[] }>('/donations/stats'),
+  getNextReceiptNo: () => get<{ receipt_no: string }>('/donations/next-receipt-no'),
+  createDonation: (data: any) => post<any>('/donations', data),
+  updateDonation: (id: string, data: any) => put<any>(`/donations/${id}`, data),
+  deleteDonation: (id: string) => del(`/donations/${id}`),
 };
