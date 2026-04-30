@@ -63,13 +63,13 @@ export function generateDonationReceiptPDF(d: DonationReceipt): jsPDF {
   doc.setFontSize(9);
   doc.text("417, Vegetarian Village, Puzhal, Chennai, Tamil Nadu 600060", W / 2, 92, { align: "center" });
   doc.setFont("helvetica", "bold");
-  doc.text("Ph:", W / 2 - 90, 105);
+  doc.text("Ph:", W / 2 - 130, 105);
   doc.setFont("helvetica", "normal");
-  doc.text("+91 7603951126", W / 2 - 75, 105);
+  doc.text("+91 7603951126, 9444412706", W / 2 - 115, 105);
   doc.setFont("helvetica", "bold");
-  doc.text("E-Mail:", W / 2 + 5, 105);
+  doc.text("E-Mail:", W / 2 + 50, 105);
   doc.setFont("helvetica", "normal");
-  doc.text("agbm.chennai@gmail.com", W / 2 + 40, 105);
+  doc.text("adigoudtrust@gmail.com", W / 2 + 85, 105);
 
   // Body box
   const bodyTop = 120;
