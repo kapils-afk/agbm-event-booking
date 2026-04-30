@@ -133,7 +133,13 @@ export default function HomePage() {
     }
     setSubmitting(true);
     try {
-      await api.submitEnquiry({ name: form.name, email: form.email, mobile: form.mobile, message: form.message });
+      const { error } = await supabase.from("contact_enquiries").insert({
+        name: form.name,
+        email: form.email || null,
+        mobile: form.mobile || null,
+        message: form.message,
+      });
+      if (error) throw error;
       setSubmitted(true);
       setForm({ name: "", email: "", mobile: "", message: "" });
     } catch {
