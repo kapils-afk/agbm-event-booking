@@ -219,7 +219,7 @@ export default function HomePage() {
           {[
             { icon: Users, value: `${stats.activeMembers}+`, label: "Active Members" },
             { icon: CalendarDays, value: `${stats.eventsOrganized}+`, label: "Events Organized" },
-            { icon: Heart, value: `${stats.yearsOfService}+`, label: "Years of Service" },
+            { icon: Heart, value: `25+`, label: "Years of Togetherness" },
           ].map((item) => (
             <div key={item.label} className="flex flex-col items-center gap-2">
               <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center">
