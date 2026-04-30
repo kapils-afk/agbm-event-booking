@@ -32,7 +32,7 @@ export function generateBookingPDF(booking: Booking) {
   doc.line(margin, y, w - margin, y);
   y += 6;
 
-  addText("APPLICATION CUM BOOKING REGISTRATION FORM", w / 2, y, { size: 12, bold: true, align: "center" });
+  addText("BOOKING REGISTRATION FORM", w / 2, y, { size: 12, bold: true, align: "center" });
   y += 10;
 
   // Section A

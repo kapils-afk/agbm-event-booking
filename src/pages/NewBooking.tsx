@@ -142,6 +142,8 @@ export default function NewBooking() {
         fromDateTime, toDateTime,
         allottedSlot: form.allottedSlot as Booking["allottedSlot"],
         hallType,
+        regularRooms: halls.includes("Rooms") && Number(regularRooms) > 0 ? Number(regularRooms) : undefined,
+        deluxeRooms: halls.includes("Rooms") && Number(deluxeRooms) > 0 ? Number(deluxeRooms) : undefined,
         utilityCharges: Number(form.utilityCharges),
         receiptNumber: form.receiptNumber,
         bookingDate: form.bookingDate,

@@ -17,6 +17,8 @@ export interface Booking {
   toDateTime: string;
   allottedSlot: "AM" | "PM";
   hallType: string;
+  regularRooms?: number;
+  deluxeRooms?: number;
   utilityCharges: number;
   receiptNumber: string;
   bookingDate: string;
@@ -56,6 +58,8 @@ function toApiPayload(booking: Booking) {
     to_date_time: booking.toDateTime,
     allotted_slot: booking.allottedSlot,
     hall_type: booking.hallType,
+    regular_rooms: booking.regularRooms ?? null,
+    deluxe_rooms: booking.deluxeRooms ?? null,
     utility_charges: booking.utilityCharges,
     receipt_number: booking.receiptNumber,
     booking_date: booking.bookingDate,

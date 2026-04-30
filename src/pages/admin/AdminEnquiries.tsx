@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,26 +35,29 @@ export default function AdminEnquiries() {
   }, []);
 
   const fetchEnquiries = async () => {
-    const { data, error } = await supabase
-      .from("contact_enquiries")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) { toast({ title: "Failed to load", description: error.message, variant: "destructive" }); return; }
-    setEnquiries((data || []) as Enquiry[]);
+    try {
+      const data = await api.getEnquiries();
+      setEnquiries(data as Enquiry[]);
+    } catch (err: any) {
+      toast({ title: "Failed to load", description: err.message, variant: "destructive" });
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this enquiry?")) return;
-    const { error } = await supabase.from("contact_enquiries").delete().eq("id", id);
-    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
-    toast({ title: "Deleted" });
-    fetchEnquiries();
+    try {
+      await api.deleteEnquiry(id);
+      toast({ title: "Deleted" });
+      fetchEnquiries();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
   };
 
   const handleView = async (e: Enquiry) => {
     setViewing(e);
     if (!e.is_read) {
-      await supabase.from("contact_enquiries").update({ is_read: true }).eq("id", e.id);
+      await api.markEnquiryRead(e.id);
       fetchEnquiries();
     }
   };

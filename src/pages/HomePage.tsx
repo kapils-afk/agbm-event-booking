@@ -11,7 +11,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 interface SiteStats {
@@ -133,13 +132,12 @@ export default function HomePage() {
     }
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("contact_enquiries").insert({
+      await api.submitEnquiry({
         name: form.name,
-        email: form.email || null,
-        mobile: form.mobile || null,
+        email: form.email || undefined,
+        mobile: form.mobile || undefined,
         message: form.message,
       });
-      if (error) throw error;
       setSubmitted(true);
       setForm({ name: "", email: "", mobile: "", message: "" });
     } catch {
