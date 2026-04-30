@@ -21,6 +21,7 @@ import AdminTrustCommittee from "@/pages/admin/AdminTrustCommittee";
 import AdminTrustDashboard from "@/pages/admin/AdminTrustDashboard";
 import AdminTrustList from "@/pages/admin/AdminTrustList";
 import AdminTrustEntry from "@/pages/admin/AdminTrustEntry";
+import AdminEnquiries from "@/pages/admin/AdminEnquiries";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,8 @@ const App = () => (
           <Route path="/admin/trust/list" element={<AdminTrustList />} />
           <Route path="/admin/trust/new" element={<AdminTrustEntry />} />
           <Route path="/admin/trust/edit/:id" element={<AdminTrustEntry />} />
+          <Route path="/admin/enquiries" element={<AdminEnquiries />} />
+
 
           {/* Booking system - nested routes */}
           <Route path="/booking" element={<BookingLayout />}>

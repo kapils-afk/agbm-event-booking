@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-interface AdminSession { id: string; name: string; mobile: string; is_super_admin: boolean; }
 import { supabase } from "@/integrations/supabase/client";
-import { api } from "@/lib/api";
+import { loadBookings } from "@/lib/bookingStore";
 import {
   Users, Megaphone, Image, CalendarDays, Award, UserCheck,
-  LogOut, ArrowLeft, Shield, LayoutDashboard, HeartHandshake
+  LogOut, ArrowLeft, Shield, LayoutDashboard, HeartHandshake, BookOpen, MessageSquare
 } from "lucide-react";
 
 interface AdminSession {
@@ -26,6 +24,8 @@ interface ModuleStats {
   officeBearers: number;
   trustCommittee: number;
   trust: number;
+  bookings: number;
+  enquiries: number;
 }
 
 const modules = [
@@ -36,39 +36,48 @@ const modules = [
   { key: "officeBearers", title: "Office Bearers", description: "Manage office bearer details and photos", icon: Award, color: "from-red-500 to-rose-500", route: "/admin/office-bearers" },
   { key: "trustCommittee", title: "Trust Committee", description: "Manage trust committee members", icon: UserCheck, color: "from-teal-500 to-cyan-500", route: "/admin/trust-committee" },
   { key: "trust", title: "Charitable Trust", description: "Donor entries, receipts & dashboard", icon: HeartHandshake, color: "from-rose-500 to-pink-600", route: "/admin/trust" },
+  { key: "bookings", title: "Hall Bookings", description: "Manage hall reservations & receipts", icon: BookOpen, color: "from-indigo-500 to-blue-600", route: "/booking/dashboard" },
+  { key: "enquiries", title: "Contact Enquiries", description: "View messages submitted from the website", icon: MessageSquare, color: "from-fuchsia-500 to-purple-600", route: "/admin/enquiries" },
 ];
 
 export default function AdminDashboard() {
   const [admin, setAdmin] = useState<AdminSession | null>(null);
-  const [stats, setStats] = useState<ModuleStats>({ members: 0, announcements: 0, gallery: 0, events: 0, officeBearers: 0, trustCommittee: 0, trust: 0 });
+  const [stats, setStats] = useState<ModuleStats>({ members: 0, announcements: 0, gallery: 0, events: 0, officeBearers: 0, trustCommittee: 0, trust: 0, bookings: 0, enquiries: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
     const session = localStorage.getItem("admin_session");
     if (!session) { navigate("/admin/login"); return; }
     setAdmin(JSON.parse(session));
-    api.adminStats().then(setStats).catch(() => {});
+    fetchStats();
   }, [navigate]);
 
   const fetchStats = async () => {
-    const [m, a, g, e, ob, tc, tr] = await Promise.all([
-      supabase.from("members").select("id", { count: "exact", head: true }),
-      supabase.from("announcements").select("id", { count: "exact", head: true }),
-      supabase.from("gallery").select("id", { count: "exact", head: true }),
-      supabase.from("events").select("id", { count: "exact", head: true }),
-      supabase.from("office_bearers").select("id", { count: "exact", head: true }),
-      supabase.from("trust_committee").select("id", { count: "exact", head: true }),
-      supabase.from("donations").select("id", { count: "exact", head: true }),
-    ]);
-    setStats({
-      members: m.count || 0,
-      announcements: a.count || 0,
-      gallery: g.count || 0,
-      events: e.count || 0,
-      officeBearers: ob.count || 0,
-      trustCommittee: tc.count || 0,
-      trust: tr.count || 0,
-    });
+    try {
+      const [m, a, g, e, ob, tc, tr, en] = await Promise.all([
+        supabase.from("members").select("id", { count: "exact", head: true }),
+        supabase.from("announcements").select("id", { count: "exact", head: true }),
+        supabase.from("gallery").select("id", { count: "exact", head: true }),
+        supabase.from("events").select("id", { count: "exact", head: true }),
+        supabase.from("office_bearers").select("id", { count: "exact", head: true }),
+        supabase.from("trust_committee").select("id", { count: "exact", head: true }),
+        supabase.from("donations").select("id", { count: "exact", head: true }),
+        supabase.from("contact_enquiries").select("id", { count: "exact", head: true }),
+      ]);
+      let bookings = 0;
+      try { bookings = (await loadBookings()).length; } catch { /* booking API may be offline */ }
+      setStats({
+        members: m.count || 0,
+        announcements: a.count || 0,
+        gallery: g.count || 0,
+        events: e.count || 0,
+        officeBearers: ob.count || 0,
+        trustCommittee: tc.count || 0,
+        trust: tr.count || 0,
+        bookings,
+        enquiries: en.count || 0,
+      });
+    } catch { /* ignore */ }
   };
 
   const handleLogout = () => {
