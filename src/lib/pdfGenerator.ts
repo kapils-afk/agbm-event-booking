@@ -25,7 +25,7 @@ export function generateBookingPDF(booking: Booking) {
   y += 5;
   addText("No. 417, Vegetarian Village, Puzhal, Chennai - 600 066", w / 2, y, { size: 9, align: "center" });
   y += 5;
-  addText("Phone: 76039 51126", w / 2, y, { size: 9, align: "center" });
+  addText("Phone: 7603951126, 9444412706  |  Email: adigoudtrust@gmail.com", w / 2, y, { size: 9, align: "center" });
   y += 8;
 
   doc.setDrawColor(0);
