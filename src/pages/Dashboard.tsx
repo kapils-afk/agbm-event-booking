@@ -46,10 +46,18 @@ export default function Dashboard() {
   const calendarDays = Array.from({ length: firstDay }, () => null).concat(Array.from({ length: daysInMonth }, (_, i) => i + 1));
 
   return (
-    <div className="p-4 md:p-6 space-y-6 animate-fade-in">
-      <div className="rounded-lg overflow-hidden shadow-md">
-        <img src="/images/adigoud-banner.jpg" alt="Adi Goud Bhawan Banner" className="w-full h-auto object-cover" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+    <div className="animate-fade-in">
+      {/* Themed banner — matches Charitable Trust dashboard */}
+      <div className="relative h-44 md:h-56 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-600 via-red-600 to-rose-700" />
+        <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col justify-center text-white">
+          <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2"><BookOpen size={26} /> Hall Booking System</h2>
+          <p className="text-sm md:text-base opacity-90 mt-1">Adi Goud Bhawan — Reservations Dashboard</p>
+        </div>
       </div>
+
+      <div className="p-4 md:p-6 space-y-6">
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {widgets.map(w => (
