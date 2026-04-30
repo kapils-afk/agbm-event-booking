@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { loadBookings } from "@/lib/bookingStore";
+import { api } from "@/lib/api";
 import {
   Users, Megaphone, Image, CalendarDays, Award, UserCheck,
   LogOut, ArrowLeft, Shield, LayoutDashboard, HeartHandshake, BookOpen, MessageSquare
@@ -54,29 +53,8 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const [m, a, g, e, ob, tc, tr, en] = await Promise.all([
-        supabase.from("members").select("id", { count: "exact", head: true }),
-        supabase.from("announcements").select("id", { count: "exact", head: true }),
-        supabase.from("gallery").select("id", { count: "exact", head: true }),
-        supabase.from("events").select("id", { count: "exact", head: true }),
-        supabase.from("office_bearers").select("id", { count: "exact", head: true }),
-        supabase.from("trust_committee").select("id", { count: "exact", head: true }),
-        supabase.from("donations").select("id", { count: "exact", head: true }),
-        supabase.from("contact_enquiries").select("id", { count: "exact", head: true }),
-      ]);
-      let bookings = 0;
-      try { bookings = (await loadBookings()).length; } catch { /* booking API may be offline */ }
-      setStats({
-        members: m.count || 0,
-        announcements: a.count || 0,
-        gallery: g.count || 0,
-        events: e.count || 0,
-        officeBearers: ob.count || 0,
-        trustCommittee: tc.count || 0,
-        trust: tr.count || 0,
-        bookings,
-        enquiries: en.count || 0,
-      });
+      const data = await api.adminStats();
+      setStats(data);
     } catch { /* ignore */ }
   };
 

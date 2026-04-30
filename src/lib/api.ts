@@ -30,7 +30,7 @@ export const api = {
   siteStats: () => get<{ activeMembers: number; eventsOrganized: number; yearsOfService: number }>('/site-stats'),
 
   // Admin stats
-  adminStats: () => get<{ members: number; announcements: number; gallery: number; events: number; officeBearers: number; trustCommittee: number }>('/admin/stats'),
+  adminStats: () => get<{ members: number; announcements: number; gallery: number; events: number; officeBearers: number; trustCommittee: number; trust: number; bookings: number; enquiries: number }>('/admin/stats'),
 
   // Members
   getMembers: () => get<any[]>('/members'),
