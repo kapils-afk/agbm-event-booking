@@ -51,6 +51,12 @@ export default function AdminMembers() {
     } finally { setLoading(false); }
   };
 
+  const handleEdit = (m: any) => {
+    setEditId(m.id);
+    setForm({ name: m.name || "", mobile: m.mobile || "", password: "", email: m.email || "", aadhaar: m.aadhaar || "", address: m.address || "" });
+    setShowForm(true);
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this member?")) return;
     await api.deleteMember(id);
