@@ -7,7 +7,7 @@ export interface Booking {
   occupation: string;
   phone: string;
   alternatePhone?: string;
-  proofIdType: "Aadhaar" | "PAN" | "Driving License";
+  proofIdType: string;
   proofIdNumber: string;
   advancePayment?: number;
   tariffAmount?: number;
