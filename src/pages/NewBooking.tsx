@@ -111,7 +111,9 @@ export default function NewBooking() {
       if (reg < 0 || reg > MAX_REGULAR_ROOMS) e.rooms = `Regular rooms 0-${MAX_REGULAR_ROOMS}`;
       if (dlx < 0 || dlx > MAX_DELUXE_ROOMS) e.rooms = `Deluxe rooms 0-${MAX_DELUXE_ROOMS}`;
     }
-    if (!form.utilityCharges || Number(form.utilityCharges) <= 0) e.utilityCharges = "Required";
+    if (utilityItems.length === 0) e.utilityCharges = "Add at least one charge";
+    else if (utilityItems.some(u => !u.description.trim())) e.utilityCharges = "Each charge needs a description";
+    else if (tariffAmount <= 0) e.utilityCharges = "Total tariff must be greater than 0";
     if (!form.receiptNumber.trim()) e.receiptNumber = "Required";
     if (!form.bookingDate) e.bookingDate = "Required";
     if (!form.termsAccepted) e.termsAccepted = "You must accept the terms";
