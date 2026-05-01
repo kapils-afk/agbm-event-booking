@@ -139,13 +139,14 @@ export default function NewBooking() {
         if (Number(deluxeRooms) > 0) parts.push(`Deluxe AC Rooms: ${deluxeRooms}`);
         if (parts.length) purpose = `${purpose ? purpose + "\n" : ""}${parts.join(", ")}`;
       }
+      purpose = encodeExtras(purpose, { utilities: utilityItems, advances: advanceItems });
       const booking: Booking = {
         id: generateBookingId(),
         name: form.name, address: form.address, occupation: form.occupation,
         phone: form.phone, alternatePhone: form.alternatePhone || undefined,
         proofIdType, proofIdNumber,
-        advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined,
-        tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
+        advancePayment: totalAdvance > 0 ? totalAdvance : undefined,
+        tariffAmount: tariffAmount > 0 ? tariffAmount : undefined,
         functionType: form.functionType,
         purposeDescription: purpose || undefined,
         fromDateTime, toDateTime,
@@ -153,7 +154,7 @@ export default function NewBooking() {
         hallType,
         regularRooms: halls.includes("Rooms") && Number(regularRooms) > 0 ? Number(regularRooms) : undefined,
         deluxeRooms: halls.includes("Rooms") && Number(deluxeRooms) > 0 ? Number(deluxeRooms) : undefined,
-        utilityCharges: Number(form.utilityCharges),
+        utilityCharges: tariffAmount,
         receiptNumber: form.receiptNumber,
         bookingDate: form.bookingDate,
         termsAccepted: form.termsAccepted,
