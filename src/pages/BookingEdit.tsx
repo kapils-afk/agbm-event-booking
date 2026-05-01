@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { loadBookings, updateBooking, type Booking } from "@/lib/bookingStore";
 import { generateBookingPDF } from "@/lib/pdfGenerator";
+import { encodeExtras, decodeExtras, stripExtras, sumUtilities, sumAdvances, type UtilityItem, type AdvanceItem } from "@/lib/bookingExtras";
+import { UtilityChargesEditor, AdvancePaymentsEditor } from "@/components/booking/ChargesEditors";
 import { toast } from "sonner";
 
 const proofIdTypes = ["Aadhaar", "PAN", "Driving License"] as const;
@@ -90,15 +92,19 @@ export default function BookingEdit() {
   const [halls, setHalls] = useState<HallOption[]>([]);
   const [regularRooms, setRegularRooms] = useState("");
   const [deluxeRooms, setDeluxeRooms] = useState("");
+  const [utilityItems, setUtilityItems] = useState<UtilityItem[]>([]);
+  const [advanceItems, setAdvanceItems] = useState<AdvanceItem[]>([]);
 
   const [form, setForm] = useState({
     name: "", address: "", occupation: "", phone: "", alternatePhone: "",
-    advancePayment: "", tariffAmount: "",
     functionType: "", purposeDescription: "",
     fromDate: "", fromTime: "", toDate: "", toTime: "", allottedSlot: "" as string,
-    utilityCharges: "", receiptNumber: "", bookingDate: "",
+    receiptNumber: "", bookingDate: "",
     termsAccepted: false, signature: "", functionName: "",
   });
+
+  const tariffAmount = sumUtilities(utilityItems);
+  const totalAdvance = sumAdvances(advanceItems);
 
   useEffect(() => {
     loadBookings().then(bookings => {
@@ -116,19 +122,30 @@ export default function BookingEdit() {
       setRegularRooms(booking.regularRooms ? String(booking.regularRooms) : "");
       setDeluxeRooms(booking.deluxeRooms ? String(booking.deluxeRooms) : "");
 
+      // Hydrate dynamic charges/advances from purposeDescription marker, or fall back to legacy scalars
+      const extras = decodeExtras(booking.purposeDescription);
+      const cleanPurpose = stripExtras(booking.purposeDescription || "");
+      if (extras.utilities.length > 0) {
+        setUtilityItems(extras.utilities);
+      } else if (Number(booking.utilityCharges) > 0) {
+        setUtilityItems([{ description: "Utility Charges", amount: Number(booking.utilityCharges) }]);
+      }
+      if (extras.advances.length > 0) {
+        setAdvanceItems(extras.advances);
+      } else if (booking.advancePayment && Number(booking.advancePayment) > 0) {
+        setAdvanceItems([{ date: booking.bookingDate || new Date().toISOString().slice(0, 10), amount: Number(booking.advancePayment), note: "" }]);
+      }
+
       setForm({
         name: booking.name,
         address: booking.address,
         occupation: booking.occupation,
         phone: booking.phone,
         alternatePhone: booking.alternatePhone || "",
-        advancePayment: booking.advancePayment != null ? String(booking.advancePayment) : "",
-        tariffAmount: booking.tariffAmount != null ? String(booking.tariffAmount) : "",
         functionType: booking.functionType,
-        purposeDescription: booking.purposeDescription || "",
+        purposeDescription: cleanPurpose,
         fromDate, fromTime, toDate, toTime,
         allottedSlot: booking.allottedSlot,
-        utilityCharges: String(booking.utilityCharges),
         receiptNumber: booking.receiptNumber,
         bookingDate: booking.bookingDate,
         termsAccepted: booking.termsAccepted,
@@ -181,7 +198,9 @@ export default function BookingEdit() {
       if (reg < 0 || reg > MAX_REGULAR_ROOMS) e.rooms = `Regular rooms 0-${MAX_REGULAR_ROOMS}`;
       if (dlx < 0 || dlx > MAX_DELUXE_ROOMS) e.rooms = `Deluxe rooms 0-${MAX_DELUXE_ROOMS}`;
     }
-    if (!form.utilityCharges || Number(form.utilityCharges) <= 0) e.utilityCharges = "Required";
+    if (utilityItems.length === 0) e.utilityCharges = "Add at least one charge";
+    else if (utilityItems.some(u => !u.description.trim())) e.utilityCharges = "Each charge needs a description";
+    else if (tariffAmount <= 0) e.utilityCharges = "Total tariff must be greater than 0";
     if (!form.receiptNumber.trim()) e.receiptNumber = "Required";
     if (!form.bookingDate) e.bookingDate = "Required";
     if (!form.termsAccepted) e.termsAccepted = "You must accept the terms";
@@ -206,13 +225,14 @@ export default function BookingEdit() {
       purpose = purpose.replace(/\n?(Regular AC Rooms:[^\n]*|Deluxe AC Rooms:[^\n]*)/g, "").trim();
       if (parts.length) purpose = `${purpose ? purpose + "\n" : ""}${parts.join(", ")}`;
     }
+    purpose = encodeExtras(purpose, { utilities: utilityItems, advances: advanceItems });
     return {
       id: id!,
       name: form.name, address: form.address, occupation: form.occupation,
       phone: form.phone, alternatePhone: form.alternatePhone || undefined,
       proofIdType, proofIdNumber,
-      advancePayment: form.advancePayment ? Number(form.advancePayment) : undefined,
-      tariffAmount: form.tariffAmount ? Number(form.tariffAmount) : undefined,
+      advancePayment: totalAdvance > 0 ? totalAdvance : undefined,
+      tariffAmount: tariffAmount > 0 ? tariffAmount : undefined,
       functionType: form.functionType,
       purposeDescription: purpose || undefined,
       fromDateTime, toDateTime,
@@ -220,7 +240,7 @@ export default function BookingEdit() {
       hallType,
       regularRooms: halls.includes("Rooms") && Number(regularRooms) > 0 ? Number(regularRooms) : undefined,
       deluxeRooms: halls.includes("Rooms") && Number(deluxeRooms) > 0 ? Number(deluxeRooms) : undefined,
-      utilityCharges: Number(form.utilityCharges),
+      utilityCharges: tariffAmount,
       receiptNumber: form.receiptNumber,
       bookingDate: form.bookingDate,
       termsAccepted: form.termsAccepted,
@@ -323,8 +343,14 @@ export default function BookingEdit() {
             )}
           </div>
 
-          {renderField("Tariff Amount (Rs)", "tariffAmount", "number", false, "Optional")}
-          {renderField("Advance Payment (Rs)", "advancePayment", "number", false, "Optional")}
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-sm">
+        <CardHeader><CardTitle className="text-base">Section A2 — Charges & Payments</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UtilityChargesEditor items={utilityItems} onChange={setUtilityItems} error={errors.utilityCharges} />
+          <AdvancePaymentsEditor items={advanceItems} onChange={setAdvanceItems} tariff={tariffAmount} />
         </CardContent>
       </Card>
 
@@ -386,7 +412,7 @@ export default function BookingEdit() {
             )}
           </div>
 
-          {renderField("Utility Charges (Rs)", "utilityCharges", "number", true, "Amount")}
+          
           {renderField("Receipt Number", "receiptNumber", "text", true, "Receipt #")}
           {renderField("Booking Date", "bookingDate", "date")}
         </CardContent>
