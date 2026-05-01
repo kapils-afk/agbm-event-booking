@@ -54,15 +54,20 @@ export default function NewBooking() {
   const [halls, setHalls] = useState<HallOption[]>([]);
   const [regularRooms, setRegularRooms] = useState("");
   const [deluxeRooms, setDeluxeRooms] = useState("");
+  const [utilityItems, setUtilityItems] = useState<UtilityItem[]>([]);
+  const [advanceItems, setAdvanceItems] = useState<AdvanceItem[]>([]);
 
   const [form, setForm] = useState({
     name: "", address: "", occupation: "", phone: "", alternatePhone: "",
-    advancePayment: "", tariffAmount: "",
     functionType: "", purposeDescription: "",
     fromDate: "", fromTime: "", toDate: "", toTime: "", allottedSlot: "" as string,
-    utilityCharges: "", receiptNumber: "", bookingDate: "",
+    receiptNumber: "", bookingDate: "",
     termsAccepted: false, signature: "", functionName: "",
   });
+
+  const tariffAmount = sumUtilities(utilityItems);
+  const totalAdvance = sumAdvances(advanceItems);
+  const balanceAmount = tariffAmount - totalAdvance;
 
   const set = (key: string, value: string | boolean, errorKeys: string[] = [key]) => {
     setForm(p => ({ ...p, [key]: value }));
