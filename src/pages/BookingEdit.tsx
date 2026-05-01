@@ -412,7 +412,7 @@ export default function BookingEdit() {
             )}
           </div>
 
-          {renderField("Utility Charges (Rs)", "utilityCharges", "number", true, "Amount")}
+          
           {renderField("Receipt Number", "receiptNumber", "text", true, "Receipt #")}
           {renderField("Booking Date", "bookingDate", "date")}
         </CardContent>
