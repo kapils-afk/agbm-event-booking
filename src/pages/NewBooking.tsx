@@ -248,8 +248,14 @@ export default function NewBooking() {
             )}
           </div>
 
-          {renderField("Tariff Amount (Rs)", "tariffAmount", "number", false, "Optional")}
-          {renderField("Advance Payment (Rs)", "advancePayment", "number", false, "Optional")}
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-sm">
+        <CardHeader><CardTitle className="text-base">Section A2 — Charges & Payments</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UtilityChargesEditor items={utilityItems} onChange={setUtilityItems} error={errors.utilityCharges} />
+          <AdvancePaymentsEditor items={advanceItems} onChange={setAdvanceItems} tariff={tariffAmount} />
         </CardContent>
       </Card>
 
