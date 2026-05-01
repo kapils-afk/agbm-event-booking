@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { saveBooking, generateBookingId, type Booking } from "@/lib/bookingStore";
 import { generateBookingPDF } from "@/lib/pdfGenerator";
+import { encodeExtras, sumUtilities, sumAdvances, type UtilityItem, type AdvanceItem } from "@/lib/bookingExtras";
+import { UtilityChargesEditor, AdvancePaymentsEditor } from "@/components/booking/ChargesEditors";
 import { toast } from "sonner";
 
 const proofIdTypes = ["Aadhaar", "PAN", "Driving License"] as const;
