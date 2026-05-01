@@ -122,19 +122,30 @@ export default function BookingEdit() {
       setRegularRooms(booking.regularRooms ? String(booking.regularRooms) : "");
       setDeluxeRooms(booking.deluxeRooms ? String(booking.deluxeRooms) : "");
 
+      // Hydrate dynamic charges/advances from purposeDescription marker, or fall back to legacy scalars
+      const extras = decodeExtras(booking.purposeDescription);
+      const cleanPurpose = stripExtras(booking.purposeDescription || "");
+      if (extras.utilities.length > 0) {
+        setUtilityItems(extras.utilities);
+      } else if (Number(booking.utilityCharges) > 0) {
+        setUtilityItems([{ description: "Utility Charges", amount: Number(booking.utilityCharges) }]);
+      }
+      if (extras.advances.length > 0) {
+        setAdvanceItems(extras.advances);
+      } else if (booking.advancePayment && Number(booking.advancePayment) > 0) {
+        setAdvanceItems([{ date: booking.bookingDate || new Date().toISOString().slice(0, 10), amount: Number(booking.advancePayment), note: "" }]);
+      }
+
       setForm({
         name: booking.name,
         address: booking.address,
         occupation: booking.occupation,
         phone: booking.phone,
         alternatePhone: booking.alternatePhone || "",
-        advancePayment: booking.advancePayment != null ? String(booking.advancePayment) : "",
-        tariffAmount: booking.tariffAmount != null ? String(booking.tariffAmount) : "",
         functionType: booking.functionType,
-        purposeDescription: booking.purposeDescription || "",
+        purposeDescription: cleanPurpose,
         fromDate, fromTime, toDate, toTime,
         allottedSlot: booking.allottedSlot,
-        utilityCharges: String(booking.utilityCharges),
         receiptNumber: booking.receiptNumber,
         bookingDate: booking.bookingDate,
         termsAccepted: booking.termsAccepted,
