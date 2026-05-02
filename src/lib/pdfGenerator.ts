@@ -25,6 +25,10 @@ export function generateBookingPDF(booking: Booking) {
     if (y + needed > 280) { doc.addPage(); y = 15; }
   };
 
+  // Receipt generation date (top-right)
+  addText(`Receipt Generated: ${format(new Date(), "dd/MM/yyyy hh:mm a")}`, w - margin, y, { size: 9, align: "right" });
+  y += 5;
+
   // Header
   addText("ADI GOUD BRAHMIN MAHASHABA CHARITABLE TRUST", w / 2, y, { size: 14, bold: true, align: "center" });
   y += 5;
