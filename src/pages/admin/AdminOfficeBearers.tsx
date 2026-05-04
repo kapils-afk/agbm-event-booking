@@ -53,11 +53,12 @@ export default function AdminOfficeBearers() {
     toast({ title: "Deleted" }); fetchData();
   };
 
+  const dateFiltered = useMemo(() => filterByDateRange(items, dateFrom, dateTo, (i) => i.created_at), [items, dateFrom, dateTo]);
   const { paged, total } = useMemo(
-    () => usePaginatedFilter(items, search, pageSize, page, (i, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (i, q) =>
       i.name.toLowerCase().includes(q) || i.designation.toLowerCase().includes(q)
     ),
-    [items, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   return (
