@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Award } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 
 export default function AdminOfficeBearers() {
   const [items, setItems] = useState<any[]>([]);
@@ -22,6 +22,8 @@ export default function AdminOfficeBearers() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -51,11 +53,12 @@ export default function AdminOfficeBearers() {
     toast({ title: "Deleted" }); fetchData();
   };
 
+  const dateFiltered = useMemo(() => filterByDateRange(items, dateFrom, dateTo, (i) => i.created_at), [items, dateFrom, dateTo]);
   const { paged, total } = useMemo(
-    () => usePaginatedFilter(items, search, pageSize, page, (i, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (i, q) =>
       i.name.toLowerCase().includes(q) || i.designation.toLowerCase().includes(q)
     ),
-    [items, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   return (
@@ -70,7 +73,7 @@ export default function AdminOfficeBearers() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by name or designation..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
+        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by name or designation..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} dateFrom={dateFrom} dateTo={dateTo} onDateFromChange={(v) => { setDateFrom(v); setPage(1); }} onDateToChange={(v) => { setDateTo(v); setPage(1); }} />
         <Card><CardContent className="p-0">
           <Table>
             <TableHeader><TableRow><TableHead>Photo</TableHead><TableHead>Order</TableHead><TableHead>Name</TableHead><TableHead>Designation</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>

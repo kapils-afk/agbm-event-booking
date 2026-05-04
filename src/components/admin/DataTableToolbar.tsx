@@ -49,14 +49,41 @@ interface ToolbarProps {
   placeholder?: string;
   pageSize: number;
   onPageSizeChange: (n: number) => void;
+  dateFrom?: string;
+  dateTo?: string;
+  onDateFromChange?: (v: string) => void;
+  onDateToChange?: (v: string) => void;
+  dateLabel?: string;
 }
 
-export function DataTableSearchBar({ search, onSearch, placeholder = "Search...", pageSize, onPageSizeChange }: ToolbarProps) {
+export function DataTableSearchBar({ search, onSearch, placeholder = "Search...", pageSize, onPageSizeChange, dateFrom, dateTo, onDateFromChange, onDateToChange, dateLabel = "Created" }: ToolbarProps) {
+  const showDate = onDateFromChange && onDateToChange;
+  const clearDate = () => { onDateFromChange?.(""); onDateToChange?.(""); };
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-      <div className="relative max-w-sm w-full">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder={placeholder} value={search} onChange={(e) => onSearch(e.target.value)} className="pl-10" />
+    <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
+      <div className="flex flex-wrap items-end gap-3 flex-1 min-w-0">
+        <div className="flex flex-col gap-1 flex-1 min-w-[220px] max-w-sm">
+          <Label className="text-xs text-muted-foreground">Search</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder={placeholder} value={search} onChange={(e) => onSearch(e.target.value)} className="pl-10 h-9" />
+          </div>
+        </div>
+        {showDate && (
+          <>
+            <div className="flex flex-col gap-1">
+              <Label className="text-xs text-muted-foreground flex items-center gap-1"><Calendar size={12} /> {dateLabel} From</Label>
+              <Input type="date" value={dateFrom || ""} onChange={(e) => onDateFromChange?.(e.target.value)} className="h-9 w-[160px]" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="text-xs text-muted-foreground">To</Label>
+              <Input type="date" value={dateTo || ""} onChange={(e) => onDateToChange?.(e.target.value)} className="h-9 w-[160px]" />
+            </div>
+            {(dateFrom || dateTo) && (
+              <Button variant="ghost" size="sm" className="h-9" onClick={clearDate}><X size={14} className="mr-1" /> Clear</Button>
+            )}
+          </>
+        )}
       </div>
       <div className="flex items-center gap-2 text-sm">
         <span className="text-muted-foreground">Show</span>

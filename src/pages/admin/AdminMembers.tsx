@@ -90,7 +90,7 @@ export default function AdminMembers() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by name, mobile or email..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
+        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by name, mobile or email..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} dateFrom={dateFrom} dateTo={dateTo} onDateFromChange={(v) => { setDateFrom(v); setPage(1); }} onDateToChange={(v) => { setDateTo(v); setPage(1); }} />
         <Card>
           <CardContent className="p-0">
             <Table>

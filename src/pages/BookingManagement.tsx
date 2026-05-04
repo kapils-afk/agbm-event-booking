@@ -25,6 +25,8 @@ export default function BookingManagement() {
   const [filterFunction, setFilterFunction] = useState("all");
   const [filterHall, setFilterHall] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [sortField, setSortField] = useState("fromDateTime");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -41,9 +43,18 @@ export default function BookingManagement() {
     if (filterFunction !== "all") list = list.filter(b => b.functionType === filterFunction);
     if (filterHall !== "all") list = list.filter(b => b.hallType === filterHall);
     if (filterStatus !== "all") list = list.filter(b => b.status === filterStatus);
+    if (dateFrom || dateTo) {
+      const fromTs = dateFrom ? new Date(dateFrom + "T00:00:00").getTime() : -Infinity;
+      const toTs = dateTo ? new Date(dateTo + "T23:59:59.999").getTime() : Infinity;
+      list = list.filter(b => {
+        const d = (b as any).createdAt || (b as any).created_at || b.fromDateTime;
+        const t = d ? new Date(d).getTime() : NaN;
+        return !isNaN(t) && t >= fromTs && t <= toTs;
+      });
+    }
     list.sort((a, b) => { const cmp = String((a as any)[sortField]).localeCompare(String((b as any)[sortField])); return sortDir === "asc" ? cmp : -cmp; });
     return list;
-  }, [bookings, search, filterFunction, filterHall, filterStatus, sortField, sortDir]);
+  }, [bookings, search, filterFunction, filterHall, filterStatus, dateFrom, dateTo, sortField, sortDir]);
 
   const handleDelete = async (id: string) => {
     try {
@@ -68,8 +79,22 @@ export default function BookingManagement() {
 
       <Card className="border-none shadow-sm">
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-3">
-            <Input placeholder="Search name, phone, or ID..." value={search} onChange={e => setSearch(e.target.value)} className="md:max-w-xs" />
+          <div className="flex flex-wrap gap-3 items-end">
+            <div className="flex flex-col gap-1 flex-1 min-w-[200px] max-w-xs">
+              <label className="text-xs text-muted-foreground">Search</label>
+              <Input placeholder="Search name, phone, or ID..." value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-muted-foreground">Date From</label>
+              <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-[160px]" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-muted-foreground">Date To</label>
+              <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-[160px]" />
+            </div>
+            {(dateFrom || dateTo) && (
+              <Button variant="ghost" size="sm" onClick={() => { setDateFrom(""); setDateTo(""); }}>Clear Dates</Button>
+            )}
             <Select value={filterFunction} onValueChange={setFilterFunction}>
               <SelectTrigger className="md:w-40"><SelectValue placeholder="Function" /></SelectTrigger>
               <SelectContent><SelectItem value="all">All Functions</SelectItem><SelectItem value="Marriage">Marriage</SelectItem><SelectItem value="Reception">Reception</SelectItem><SelectItem value="Other">Other</SelectItem></SelectContent>
