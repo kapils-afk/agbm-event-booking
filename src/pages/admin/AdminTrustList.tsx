@@ -113,7 +113,7 @@ export default function AdminTrustList() {
           </div>
         </div>
 
-        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by donor, mobile or receipt no..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
+        <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by donor, mobile or receipt no..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} dateFrom={dateFrom} dateTo={dateTo} onDateFromChange={(v) => { setDateFrom(v); setPage(1); }} onDateToChange={(v) => { setDateTo(v); setPage(1); }} dateLabel="Donation" />
 
         <Card>
           <CardContent className="p-0 overflow-x-auto">
