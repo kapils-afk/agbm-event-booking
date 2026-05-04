@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Image as ImageIcon } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, DateRangeFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 
 export default function AdminGallery() {
   const [items, setItems] = useState<any[]>([]);
