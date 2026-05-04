@@ -9,13 +9,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowLeft, Plus, Edit, Trash2, Download, MessageCircle, FileSpreadsheet, HeartHandshake, IndianRupee } from "lucide-react";
 import { generateDonationReceiptPDF } from "@/lib/donationReceipt";
 import * as XLSX from "xlsx";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 
 export default function AdminTrustList() {
   const [items, setItems] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -29,11 +31,12 @@ export default function AdminTrustList() {
     setItems(data);
   };
 
+  const dateFiltered = useMemo(() => filterByDateRange(items, dateFrom, dateTo, (d) => d.created_at || d.donation_date), [items, dateFrom, dateTo]);
   const { filtered, paged, total } = useMemo(
-    () => usePaginatedFilter(items, search, pageSize, page, (d, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (d, q) =>
       d.donor_name.toLowerCase().includes(q) || (d.mobile || "").toLowerCase().includes(q) || (d.receipt_no || "").toLowerCase().includes(q)
     ),
-    [items, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   const total_amt = filtered.reduce((s, d) => s + Number(d.amount || 0), 0);
