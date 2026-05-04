@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Trash2, Eye, MessageSquare, CheckCircle2 } from "lucide-react";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, DateRangeFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 import { format } from "date-fns";
 
 interface Enquiry {
