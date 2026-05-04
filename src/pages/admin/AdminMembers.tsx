@@ -66,11 +66,14 @@ export default function AdminMembers() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const dateFiltered = useMemo(() => filterByDateRange(members, dateFrom, dateTo, (m) => m.created_at), [members, dateFrom, dateTo]);
   const { paged, total } = useMemo(
-    () => usePaginatedFilter(members, search, pageSize, page, (m, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (m, q) =>
       m.name.toLowerCase().includes(q) || m.mobile.includes(q) || (m.email || "").toLowerCase().includes(q)
     ),
-    [members, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   return (
