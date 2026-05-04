@@ -64,14 +64,15 @@ export default function AdminEnquiries() {
     }
   };
 
+  const dateFiltered = useMemo(() => filterByDateRange(enquiries, dateFrom, dateTo, (e) => e.created_at), [enquiries, dateFrom, dateTo]);
   const { paged, total } = useMemo(
-    () => usePaginatedFilter(enquiries, search, pageSize, page, (e, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (e, q) =>
       e.name.toLowerCase().includes(q) ||
       (e.email || "").toLowerCase().includes(q) ||
       (e.mobile || "").includes(q) ||
       e.message.toLowerCase().includes(q)
     ),
-    [enquiries, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   return (
