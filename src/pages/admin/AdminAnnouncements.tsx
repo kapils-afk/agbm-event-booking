@@ -73,6 +73,7 @@ export default function AdminAnnouncements() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-3"><DateRangeFilter from={dateFrom} to={dateTo} onFromChange={(v) => { setDateFrom(v); setPage(1); }} onToChange={(v) => { setDateTo(v); setPage(1); }} label="Created" /></div>
         <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search announcements..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
         <Card><CardContent className="p-0">
           <Table>
