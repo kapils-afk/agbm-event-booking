@@ -110,14 +110,14 @@ export default function AdminDashboard() {
             );
           })}
         </div>
-        <div className="mt-10">
+        {/* <div className="mt-10">
           <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="flex flex-wrap gap-3">
             <Link to="/booking/dashboard"><Button variant="outline" size="sm">📋 Hall Booking System</Button></Link>
             <Link to="/admin/members"><Button variant="outline" size="sm">➕ Add New Member</Button></Link>
             <Link to="/admin/announcements"><Button variant="outline" size="sm">📢 Post Announcement</Button></Link>
           </div>
-        </div>
+        </div> */}
       </main>
     </div>
   );
