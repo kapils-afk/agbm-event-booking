@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Award } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 
 export default function AdminOfficeBearers() {
   const [items, setItems] = useState<any[]>([]);
