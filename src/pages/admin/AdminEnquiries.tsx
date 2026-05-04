@@ -25,6 +25,8 @@ export default function AdminEnquiries() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [viewing, setViewing] = useState<Enquiry | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
