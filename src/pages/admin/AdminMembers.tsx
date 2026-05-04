@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Users } from "lucide-react";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, DateRangeFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 
 
 export default function AdminMembers() {
@@ -66,11 +66,14 @@ export default function AdminMembers() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const dateFiltered = useMemo(() => filterByDateRange(members, dateFrom, dateTo, (m) => m.created_at), [members, dateFrom, dateTo]);
   const { paged, total } = useMemo(
-    () => usePaginatedFilter(members, search, pageSize, page, (m, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (m, q) =>
       m.name.toLowerCase().includes(q) || m.mobile.includes(q) || (m.email || "").toLowerCase().includes(q)
     ),
-    [members, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   return (

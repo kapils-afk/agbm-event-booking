@@ -1,7 +1,47 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Calendar, X } from "lucide-react";
+
+interface DateRangeFilterProps {
+  from: string;
+  to: string;
+  onFromChange: (v: string) => void;
+  onToChange: (v: string) => void;
+  label?: string;
+}
+
+export function DateRangeFilter({ from, to, onFromChange, onToChange, label = "Date" }: DateRangeFilterProps) {
+  const clear = () => { onFromChange(""); onToChange(""); };
+  return (
+    <div className="flex flex-wrap items-end gap-2">
+      <div className="flex flex-col gap-1">
+        <Label className="text-xs text-muted-foreground flex items-center gap-1"><Calendar size={12} /> {label} From</Label>
+        <Input type="date" value={from} onChange={(e) => onFromChange(e.target.value)} className="h-9 w-[160px]" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <Label className="text-xs text-muted-foreground">To</Label>
+        <Input type="date" value={to} onChange={(e) => onToChange(e.target.value)} className="h-9 w-[160px]" />
+      </div>
+      {(from || to) && (
+        <Button variant="ghost" size="sm" className="h-9" onClick={clear}><X size={14} className="mr-1" /> Clear</Button>
+      )}
+    </div>
+  );
+}
+
+export function filterByDateRange<T>(items: T[], from: string, to: string, getDate: (item: T) => string | Date | null | undefined): T[] {
+  if (!from && !to) return items;
+  const fromTs = from ? new Date(from + "T00:00:00").getTime() : -Infinity;
+  const toTs = to ? new Date(to + "T23:59:59.999").getTime() : Infinity;
+  return items.filter((i) => {
+    const d = getDate(i);
+    if (!d) return false;
+    const t = new Date(d).getTime();
+    return !isNaN(t) && t >= fromTs && t <= toTs;
+  });
+}
 
 interface ToolbarProps {
   search: string;

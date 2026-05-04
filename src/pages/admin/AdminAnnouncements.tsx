@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Megaphone } from "lucide-react";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, DateRangeFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 
 export default function AdminAnnouncements() {
   const [items, setItems] = useState<any[]>([]);
@@ -21,6 +21,8 @@ export default function AdminAnnouncements() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -51,11 +53,12 @@ export default function AdminAnnouncements() {
     toast({ title: "Deleted" }); fetchData();
   };
 
+  const dateFiltered = useMemo(() => filterByDateRange(items, dateFrom, dateTo, (i) => i.created_at), [items, dateFrom, dateTo]);
   const { paged, total } = useMemo(
-    () => usePaginatedFilter(items, search, pageSize, page, (i, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (i, q) =>
       i.title.toLowerCase().includes(q) || (i.content || "").toLowerCase().includes(q)
     ),
-    [items, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   return (
@@ -70,6 +73,7 @@ export default function AdminAnnouncements() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-3"><DateRangeFilter from={dateFrom} to={dateTo} onFromChange={(v) => { setDateFrom(v); setPage(1); }} onToChange={(v) => { setDateTo(v); setPage(1); }} label="Created" /></div>
         <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search announcements..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
         <Card><CardContent className="p-0">
           <Table>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Trash2, Eye, MessageSquare, CheckCircle2 } from "lucide-react";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, DateRangeFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 import { format } from "date-fns";
 
 interface Enquiry {
@@ -25,6 +25,8 @@ export default function AdminEnquiries() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [viewing, setViewing] = useState<Enquiry | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -62,14 +64,15 @@ export default function AdminEnquiries() {
     }
   };
 
+  const dateFiltered = useMemo(() => filterByDateRange(enquiries, dateFrom, dateTo, (e) => e.created_at), [enquiries, dateFrom, dateTo]);
   const { paged, total } = useMemo(
-    () => usePaginatedFilter(enquiries, search, pageSize, page, (e, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (e, q) =>
       e.name.toLowerCase().includes(q) ||
       (e.email || "").toLowerCase().includes(q) ||
       (e.mobile || "").includes(q) ||
       e.message.toLowerCase().includes(q)
     ),
-    [enquiries, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   return (
@@ -89,6 +92,7 @@ export default function AdminEnquiries() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-3"><DateRangeFilter from={dateFrom} to={dateTo} onFromChange={(v) => { setDateFrom(v); setPage(1); }} onToChange={(v) => { setDateTo(v); setPage(1); }} label="Created" /></div>
         <DataTableSearchBar
           search={search}
           onSearch={(v) => { setSearch(v); setPage(1); }}

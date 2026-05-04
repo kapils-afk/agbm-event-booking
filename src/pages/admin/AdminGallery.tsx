@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Trash2, Edit, Image as ImageIcon } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { DataTableSearchBar, DataTablePagination, usePaginatedFilter } from "@/components/admin/DataTableToolbar";
+import { DataTableSearchBar, DataTablePagination, usePaginatedFilter, DateRangeFilter, filterByDateRange } from "@/components/admin/DataTableToolbar";
 
 export default function AdminGallery() {
   const [items, setItems] = useState<any[]>([]);
@@ -22,6 +22,8 @@ export default function AdminGallery() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -51,11 +53,12 @@ export default function AdminGallery() {
     toast({ title: "Deleted" }); fetchData();
   };
 
+  const dateFiltered = useMemo(() => filterByDateRange(items, dateFrom, dateTo, (i) => i.created_at), [items, dateFrom, dateTo]);
   const { paged, total } = useMemo(
-    () => usePaginatedFilter(items, search, pageSize, page, (i, q) =>
+    () => usePaginatedFilter(dateFiltered, search, pageSize, page, (i, q) =>
       i.title.toLowerCase().includes(q) || (i.category || "").toLowerCase().includes(q)
     ),
-    [items, search, pageSize, page]
+    [dateFiltered, search, pageSize, page]
   );
 
   return (
@@ -70,6 +73,7 @@ export default function AdminGallery() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-3"><DateRangeFilter from={dateFrom} to={dateTo} onFromChange={(v) => { setDateFrom(v); setPage(1); }} onToChange={(v) => { setDateTo(v); setPage(1); }} label="Created" /></div>
         <DataTableSearchBar search={search} onSearch={(v) => { setSearch(v); setPage(1); }} placeholder="Search by title or category..." pageSize={pageSize} onPageSizeChange={(n) => { setPageSize(n); setPage(1); }} />
         {paged.length === 0 ? (
           <Card><CardContent className="py-12 text-center text-muted-foreground">No gallery items found</CardContent></Card>
