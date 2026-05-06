@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
+import { setMemberSession } from "@/lib/memberSession";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Lock, LogIn } from "lucide-react";
 
@@ -29,10 +30,10 @@ export default function MemberLoginDialog({ open, onOpenChange }: MemberLoginDia
     setLoading(true);
     try {
       const data = await api.memberLogin(mobile, password);
-      localStorage.setItem("member_session", JSON.stringify(data));
+      setMemberSession({ id: data.id, name: data.name, mobile: data.mobile });
       toast({ title: "Welcome!", description: `Logged in as ${data.name}` });
       onOpenChange(false);
-      navigate("/booking/dashboard");
+      navigate("/member/profile");
     } catch (err: any) {
       toast({ title: "Login Failed", description: err.message || "Invalid mobile number or password", variant: "destructive" });
     } finally {

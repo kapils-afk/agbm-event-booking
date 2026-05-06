@@ -17,7 +17,7 @@ export default function AdminMembers() {
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" });
+  const [form, setForm] = useState({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "", blood_group: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,13 +38,13 @@ export default function AdminMembers() {
     setLoading(true);
     try {
       if (editId) {
-        await api.updateMember(editId, { name: form.name, mobile: form.mobile, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null, ...(form.password && { password: form.password }) });
+        await api.updateMember(editId, { name: form.name, mobile: form.mobile, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null, blood_group: form.blood_group || null, ...(form.password && { password: form.password }) });
         toast({ title: "Updated" });
       } else {
-        await api.createMember({ name: form.name, mobile: form.mobile, password: form.password, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null });
+        await api.createMember({ name: form.name, mobile: form.mobile, password: form.password, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null, blood_group: form.blood_group || null });
         toast({ title: "Added" });
       }
-      setShowForm(false); setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" });
+      setShowForm(false); setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "", blood_group: "" });
       fetchMembers();
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -53,7 +53,7 @@ export default function AdminMembers() {
 
   const handleEdit = (m: any) => {
     setEditId(m.id);
-    setForm({ name: m.name || "", mobile: m.mobile || "", password: "", email: m.email || "", aadhaar: m.aadhaar || "", address: m.address || "" });
+    setForm({ name: m.name || "", mobile: m.mobile || "", password: "", email: m.email || "", aadhaar: m.aadhaar || "", address: m.address || "", blood_group: m.blood_group || "" });
     setShowForm(true);
   };
 
@@ -84,7 +84,7 @@ export default function AdminMembers() {
             <Link to="/admin"><Button variant="ghost" size="sm"><ArrowLeft size={14} /></Button></Link>
             <div className="flex items-center gap-2"><Users size={18} className="text-blue-500" /><h1 className="font-bold">Registered Members</h1></div>
           </div>
-          <Button size="sm" onClick={() => { setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" }); setShowForm(true); }} className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+          <Button size="sm" onClick={() => { setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "", blood_group: "" }); setShowForm(true); }} className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
             <Plus size={14} className="mr-1" /> Add Member
           </Button>
         </div>
@@ -135,6 +135,12 @@ export default function AdminMembers() {
             <div><Label>Password {editId ? "(leave blank to keep)" : "*"}</Label><Input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} /></div>
             <div><Label>Email</Label><Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
             <div><Label>Aadhaar</Label><Input value={form.aadhaar} onChange={e => setForm(f => ({ ...f, aadhaar: e.target.value }))} /></div>
+            <div><Label>Blood Group</Label>
+              <select className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm" value={form.blood_group} onChange={e => setForm(f => ({ ...f, blood_group: e.target.value }))}>
+                <option value="">— Select —</option>
+                {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map(g => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
             <div><Label>Address</Label><Input value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} /></div>
             <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white" disabled={loading}>{loading ? "Saving..." : editId ? "Update Member" : "Register Member"}</Button>
           </form>

@@ -231,6 +231,7 @@ export type Database = {
         Row: {
           aadhaar: string | null
           address: string | null
+          blood_group: string | null
           created_at: string
           email: string | null
           id: string
@@ -244,6 +245,7 @@ export type Database = {
         Insert: {
           aadhaar?: string | null
           address?: string | null
+          blood_group?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -257,6 +259,7 @@ export type Database = {
         Update: {
           aadhaar?: string | null
           address?: string | null
+          blood_group?: string | null
           created_at?: string
           email?: string | null
           id?: string

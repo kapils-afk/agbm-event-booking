@@ -85,6 +85,7 @@ const defaultEvents: EventItem[] = [
 
 export default function HomePage() {
   const [stats] = useState<SiteStats>(defaultStats);
+  const [memberLoginOpen, setMemberLoginOpen] = useState(false);
   const [events, setEvents] = useState<EventItem[]>(defaultEvents);
   const [gallery, setGallery] = useState<{ url: string; title: string }[]>(defaultGallery);
   const [galleryApi, setGalleryApi] = useState<CarouselApi | undefined>();
@@ -177,6 +178,9 @@ export default function HomePage() {
             <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setMemberLoginOpen(true)} className="border-orange-500 text-orange-600 hover:bg-orange-50">
+              <Users size={14} className="mr-1" /> Member Login
+            </Button>
             <Link to="/admin/login">
               <Button size="sm" variant="outline">
                 <Shield size={14} className="mr-1" /> Admin
@@ -185,6 +189,7 @@ export default function HomePage() {
           </div>
         </div>
       </header>
+      <MemberLoginDialog open={memberLoginOpen} onOpenChange={setMemberLoginOpen} />
 
       {/* Hero */}
       <section id="home" className="relative bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white">
