@@ -29,16 +29,7 @@ export default function MemberLoginDialog({ open, onOpenChange }: MemberLoginDia
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("members")
-        .select("id, name, mobile, password_hash, is_active")
-        .eq("mobile", mobile.trim())
-        .maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error("No account found for this mobile number");
-      if (data.is_active === false) throw new Error("Account is inactive. Please contact admin.");
-      // password_hash stored as plain (matches existing project pattern via external API)
-      if (data.password_hash !== password) throw new Error("Invalid mobile number or password");
+      const data = await api.memberLogin(mobile, password);
       setMemberSession({ id: data.id, name: data.name, mobile: data.mobile });
       toast({ title: "Welcome!", description: `Logged in as ${data.name}` });
       onOpenChange(false);
