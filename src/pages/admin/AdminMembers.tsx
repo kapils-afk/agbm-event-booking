@@ -17,7 +17,7 @@ export default function AdminMembers() {
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" });
+  const [form, setForm] = useState({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "", blood_group: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,13 +38,13 @@ export default function AdminMembers() {
     setLoading(true);
     try {
       if (editId) {
-        await api.updateMember(editId, { name: form.name, mobile: form.mobile, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null, ...(form.password && { password: form.password }) });
+        await api.updateMember(editId, { name: form.name, mobile: form.mobile, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null, blood_group: form.blood_group || null, ...(form.password && { password: form.password }) });
         toast({ title: "Updated" });
       } else {
-        await api.createMember({ name: form.name, mobile: form.mobile, password: form.password, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null });
+        await api.createMember({ name: form.name, mobile: form.mobile, password: form.password, email: form.email || null, aadhaar: form.aadhaar || null, address: form.address || null, blood_group: form.blood_group || null });
         toast({ title: "Added" });
       }
-      setShowForm(false); setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" });
+      setShowForm(false); setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "", blood_group: "" });
       fetchMembers();
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -53,7 +53,7 @@ export default function AdminMembers() {
 
   const handleEdit = (m: any) => {
     setEditId(m.id);
-    setForm({ name: m.name || "", mobile: m.mobile || "", password: "", email: m.email || "", aadhaar: m.aadhaar || "", address: m.address || "" });
+    setForm({ name: m.name || "", mobile: m.mobile || "", password: "", email: m.email || "", aadhaar: m.aadhaar || "", address: m.address || "", blood_group: m.blood_group || "" });
     setShowForm(true);
   };
 
