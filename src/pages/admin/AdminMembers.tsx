@@ -135,6 +135,12 @@ export default function AdminMembers() {
             <div><Label>Password {editId ? "(leave blank to keep)" : "*"}</Label><Input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} /></div>
             <div><Label>Email</Label><Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
             <div><Label>Aadhaar</Label><Input value={form.aadhaar} onChange={e => setForm(f => ({ ...f, aadhaar: e.target.value }))} /></div>
+            <div><Label>Blood Group</Label>
+              <select className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm" value={form.blood_group} onChange={e => setForm(f => ({ ...f, blood_group: e.target.value }))}>
+                <option value="">— Select —</option>
+                {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map(g => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
             <div><Label>Address</Label><Input value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} /></div>
             <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white" disabled={loading}>{loading ? "Saving..." : editId ? "Update Member" : "Register Member"}</Button>
           </form>
