@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { setMemberSession } from "@/lib/memberSession";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Lock, LogIn } from "lucide-react";
