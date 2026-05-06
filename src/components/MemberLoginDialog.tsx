@@ -74,7 +74,6 @@ export default function MemberLoginDialog({ open, onOpenChange }: MemberLoginDia
           </Button>
         </form>
         <p className="text-xs text-muted-foreground text-center mt-4">
-          Default member credentials: <br />
           Password(update after login): <code className="bg-muted px-1 rounded">member123</code>
         </p>
       </DialogContent>
