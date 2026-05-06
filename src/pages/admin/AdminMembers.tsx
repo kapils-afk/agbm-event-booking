@@ -84,7 +84,7 @@ export default function AdminMembers() {
             <Link to="/admin"><Button variant="ghost" size="sm"><ArrowLeft size={14} /></Button></Link>
             <div className="flex items-center gap-2"><Users size={18} className="text-blue-500" /><h1 className="font-bold">Registered Members</h1></div>
           </div>
-          <Button size="sm" onClick={() => { setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "" }); setShowForm(true); }} className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+          <Button size="sm" onClick={() => { setEditId(null); setForm({ name: "", mobile: "", password: "", email: "", aadhaar: "", address: "", blood_group: "" }); setShowForm(true); }} className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
             <Plus size={14} className="mr-1" /> Add Member
           </Button>
         </div>
