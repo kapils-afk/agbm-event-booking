@@ -23,6 +23,11 @@ import AdminTrustDashboard from "@/pages/admin/AdminTrustDashboard";
 import AdminTrustList from "@/pages/admin/AdminTrustList";
 import AdminTrustEntry from "@/pages/admin/AdminTrustEntry";
 import AdminEnquiries from "@/pages/admin/AdminEnquiries";
+import MemberLayout from "@/components/MemberLayout";
+import MemberProfile from "@/pages/member/MemberProfile";
+import MemberMembersList from "@/pages/member/MemberMembersList";
+import MemberOfficeBearers from "@/pages/member/MemberOfficeBearers";
+import MemberTrustCommittee from "@/pages/member/MemberTrustCommittee";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +61,14 @@ const AnimatedRoutes = () => {
           <Route path="new" element={<NewBooking />} />
           <Route path="manage" element={<BookingManagement />} />
           <Route path=":id" element={<BookingEdit />} />
+        </Route>
+
+        {/* Member portal */}
+        <Route path="/member" element={<MemberLayout />}>
+          <Route path="profile" element={<MemberProfile />} />
+          <Route path="members" element={<MemberMembersList />} />
+          <Route path="office-bearers" element={<MemberOfficeBearers />} />
+          <Route path="trust-committee" element={<MemberTrustCommittee />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
