@@ -4,7 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { api } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
+import { setMemberSession } from "@/lib/memberSession";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Lock, LogIn } from "lucide-react";
 
@@ -28,11 +29,20 @@ export default function MemberLoginDialog({ open, onOpenChange }: MemberLoginDia
     }
     setLoading(true);
     try {
-      const data = await api.memberLogin(mobile, password);
-      localStorage.setItem("member_session", JSON.stringify(data));
+      const { data, error } = await supabase
+        .from("members")
+        .select("id, name, mobile, password_hash, is_active")
+        .eq("mobile", mobile.trim())
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error("No account found for this mobile number");
+      if (data.is_active === false) throw new Error("Account is inactive. Please contact admin.");
+      // password_hash stored as plain (matches existing project pattern via external API)
+      if (data.password_hash !== password) throw new Error("Invalid mobile number or password");
+      setMemberSession({ id: data.id, name: data.name, mobile: data.mobile });
       toast({ title: "Welcome!", description: `Logged in as ${data.name}` });
       onOpenChange(false);
-      navigate("/booking/dashboard");
+      navigate("/member/profile");
     } catch (err: any) {
       toast({ title: "Login Failed", description: err.message || "Invalid mobile number or password", variant: "destructive" });
     } finally {
