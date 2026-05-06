@@ -69,7 +69,7 @@ export default function AdminLogin() {
                 {loading ? "Logging in..." : "Login as Admin"}
               </Button>
             </form>
-            <p className="text-xs text-slate-500 text-center mt-4">Default: Mobile 9999999999 / Password admin123</p>
+            
           </CardContent>
         </Card>
       </div>
