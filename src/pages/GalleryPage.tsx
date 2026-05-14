@@ -14,25 +14,22 @@ interface GalleryItem {
   category: string | null;
 }
 
-const defaultItems: GalleryItem[] = [
-  { id: "d1", title: "Annual Festival", description: "Grand celebration", image_url: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1200&q=80", category: "Annual Cultural Festival" },
-  { id: "d2", title: "Cultural Evening", description: "Classical music", image_url: "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=80", category: "Annual Cultural Festival" },
-  { id: "d3", title: "Wedding Ceremony", description: "Community wedding", image_url: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80", category: "Community Weddings" },
-  { id: "d4", title: "Reception", description: "Joyful moments", image_url: "https://images.unsplash.com/photo-1604608672516-f1b9b1d0f1f0?auto=format&fit=crop&w=1200&q=80", category: "Community Weddings" },
-  { id: "d5", title: "Annual Meet", description: "Members gathering", image_url: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=80", category: "Annual General Meet" },
-  { id: "d6", title: "Community Gathering", description: "Together as one", image_url: "https://images.unsplash.com/photo-1566499546069-3fc74ff23449?auto=format&fit=crop&w=1200&q=80", category: "Annual General Meet" },
-  { id: "d7", title: "Festival Rituals", description: "Traditional rituals", image_url: "https://images.unsplash.com/photo-1604608672394-51d8c0b5f4a0?auto=format&fit=crop&w=1200&q=80", category: "Festivals & Pujas" },
+const staticGalleryItems: GalleryItem[] = [
+  { id: "r1", title: "Community Gathering", description: "Moments from our community events", image_url: "/images/gallery/1.jpg", category: "Community Events" },
+  { id: "r2", title: "Cultural Celebration", description: "Celebrating our rich heritage", image_url: "/images/gallery/2.jpg", category: "Community Events" },
+  { id: "r3", title: "Festival Rituals", description: "Traditional ceremonies and rituals", image_url: "/images/gallery/3.jpg", category: "Festivals" },
+  { id: "r4", title: "Wedding Ceremony", description: "Blessed union celebrations", image_url: "/images/gallery/4.jpg", category: "Weddings" },
+  { id: "r5", title: "Annual Meet", description: "Members gathering together", image_url: "/images/gallery/5.jpg", category: "Annual Events" },
+  { id: "r6", title: "Traditional Music", description: "Classical and devotional music", image_url: "/images/gallery/6.jpg", category: "Annual Events" },
+  { id: "r7", title: "Community Event", description: "Special community programs", image_url: "/images/gallery/7.jpg", category: "Community Events" },
+  { id: "r8", title: "Bhavan Gathering", description: "Events at Goud Bhavan", image_url: "/images/gallery/8.jpg", category: "Bhavan Events" },
+  { id: "r9", title: "Cultural Program", description: "Performances and celebrations", image_url: "/images/gallery/9.jpg", category: "Festivals" },
+  { id: "r10", title: "Community Meet", description: "Bringing everyone together", image_url: "/images/gallery/10.jpg", category: "Bhavan Events" },
 ];
 
 export default function GalleryPage() {
-  const [items, setItems] = useState<GalleryItem[]>(defaultItems);
+  const [items] = useState<GalleryItem[]>(staticGalleryItems);
   const [preview, setPreview] = useState<GalleryItem | null>(null);
-
-  useEffect(() => {
-    api.getGallery().then((data: GalleryItem[]) => {
-      if (data?.length) setItems(data);
-    }).catch(() => {});
-  }, []);
 
   const grouped = items.reduce<Record<string, GalleryItem[]>>((acc, it) => {
     const key = it.category || "Other Moments";
