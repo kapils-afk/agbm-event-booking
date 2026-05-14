@@ -445,7 +445,7 @@ export default function HomePage() {
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Memories from Events and Community Gatherings</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {gallery.map((g, i) => (
+            {defaultGallery.map((g, i) => (
               <button
                 key={i}
                 type="button"
