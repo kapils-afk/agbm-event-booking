@@ -48,12 +48,16 @@ const defaultStats: SiteStats = {
 };
 
 const defaultGallery = [
-  { url: "https://images.unsplash.com/photo-1566499546069-3fc74ff23449?auto=format&fit=crop&w=1200&q=80", title: "Community Gathering" },
-  { url: "https://images.unsplash.com/photo-1604608672516-f1b9b1d0f1f0?auto=format&fit=crop&w=1200&q=80", title: "Cultural Celebration" },
-  { url: "https://images.unsplash.com/photo-1604608672394-51d8c0b5f4a0?auto=format&fit=crop&w=1200&q=80", title: "Festival Rituals" },
-  { url: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80", title: "Wedding Ceremony" },
-  { url: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=80", title: "Annual Meet" },
-  { url: "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=80", title: "Traditional Music" },
+  { url: "http://goudbhavan.com/assets/1-CPPJ8Vs9.JPG", title: "Community Gathering" },
+  { url: "http://goudbhavan.com/assets/2-B3LUFEx8.JPG", title: "Cultural Celebration" },
+  { url: "http://goudbhavan.com/assets/3-DnBropyF.JPG", title: "Festival Rituals" },
+  { url: "http://goudbhavan.com/assets/4-B50m4U0n.JPG", title: "Wedding Ceremony" },
+  { url: "http://goudbhavan.com/assets/5-CPhCl0GL.JPG", title: "Annual Meet" },
+  { url: "http://goudbhavan.com/assets/6-IRI1mXHA.JPG", title: "Traditional Music" },
+  { url: "http://goudbhavan.com/assets/7-DEjf8GXt.JPG", title: "Community Event" },
+  { url: "http://goudbhavan.com/assets/8-idYN5Hgi.JPG", title: "Bhavan Gathering" },
+  { url: "http://goudbhavan.com/assets/9-DWxZn2WJ.JPG", title: "Cultural Program" },
+  { url: "http://goudbhavan.com/assets/10-DRbXsTnY.jpg", title: "Community Meet" },
 ];
 
 const defaultEvents: EventItem[] = [
