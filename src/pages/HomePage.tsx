@@ -91,10 +91,7 @@ export default function HomePage() {
   const [stats] = useState<SiteStats>(defaultStats);
   const [memberLoginOpen, setMemberLoginOpen] = useState(false);
   const [events, setEvents] = useState<EventItem[]>(defaultEvents);
-  const [gallery, setGallery] = useState<{ url: string; title: string }[]>(defaultGallery);
-  const [galleryApi, setGalleryApi] = useState<CarouselApi | undefined>();
   const [preview, setPreview] = useState<{ url: string; title: string } | null>(null);
-  const autoplayRef = useRef<number | null>(null);
 
   // Contact form
   const [form, setForm] = useState({ name: "", email: "", mobile: "", message: "" });
@@ -105,10 +102,6 @@ export default function HomePage() {
   const [forumInput, setForumInput] = useState({ name: "", message: "" });
 
   useEffect(() => {
-    // api.siteStats().then(setStats).catch(() => {});
-    api.getGallery().then((data: GalleryItem[]) => {
-      if (data?.length) setGallery(data.map((g) => ({ url: g.image_url, title: g.title })));
-    }).catch(() => {});
     api.getEvents().then((data: EventItem[]) => {
       if (data?.length) setEvents(data);
     }).catch(() => {});
@@ -116,18 +109,6 @@ export default function HomePage() {
       if (data?.length) setForumPosts(data);
     }).catch(() => {});
   }, []);
-
-  // Autoplay carousel
-  useEffect(() => {
-    if (!galleryApi) return;
-    autoplayRef.current = window.setInterval(() => {
-      if (galleryApi.canScrollNext()) galleryApi.scrollNext();
-      else galleryApi.scrollTo(0);
-    }, 3000);
-    return () => {
-      if (autoplayRef.current) window.clearInterval(autoplayRef.current);
-    };
-  }, [galleryApi]);
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
