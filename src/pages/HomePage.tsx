@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter, Shield, MessageSquare, CheckCircle2, Image as ImageIcon, BedDouble, UtensilsCrossed, Building2, Sparkles, GraduationCap, Stethoscope, HandHeart, Network, ShieldCheck, Accessibility, Car, Camera, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { api } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X } from "lucide-react";
@@ -48,12 +47,16 @@ const defaultStats: SiteStats = {
 };
 
 const defaultGallery = [
-  { url: "https://images.unsplash.com/photo-1566499546069-3fc74ff23449?auto=format&fit=crop&w=1200&q=80", title: "Community Gathering" },
-  { url: "https://images.unsplash.com/photo-1604608672516-f1b9b1d0f1f0?auto=format&fit=crop&w=1200&q=80", title: "Cultural Celebration" },
-  { url: "https://images.unsplash.com/photo-1604608672394-51d8c0b5f4a0?auto=format&fit=crop&w=1200&q=80", title: "Festival Rituals" },
-  { url: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80", title: "Wedding Ceremony" },
-  { url: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=80", title: "Annual Meet" },
-  { url: "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=80", title: "Traditional Music" },
+  { url: "/images/gallery/1.jpg", title: "Community Gathering" },
+  { url: "/images/gallery/2.jpg", title: "Cultural Celebration" },
+  { url: "/images/gallery/3.jpg", title: "Festival Rituals" },
+  { url: "/images/gallery/4.jpg", title: "Wedding Ceremony" },
+  { url: "/images/gallery/5.jpg", title: "Annual Meet" },
+  { url: "/images/gallery/6.jpg", title: "Traditional Music" },
+  { url: "/images/gallery/7.jpg", title: "Community Event" },
+  { url: "/images/gallery/8.jpg", title: "Bhavan Gathering" },
+  { url: "/images/gallery/9.jpg", title: "Cultural Program" },
+  { url: "/images/gallery/10.jpg", title: "Community Meet" },
 ];
 
 const defaultEvents: EventItem[] = [
@@ -87,10 +90,7 @@ export default function HomePage() {
   const [stats] = useState<SiteStats>(defaultStats);
   const [memberLoginOpen, setMemberLoginOpen] = useState(false);
   const [events, setEvents] = useState<EventItem[]>(defaultEvents);
-  const [gallery, setGallery] = useState<{ url: string; title: string }[]>(defaultGallery);
-  const [galleryApi, setGalleryApi] = useState<CarouselApi | undefined>();
   const [preview, setPreview] = useState<{ url: string; title: string } | null>(null);
-  const autoplayRef = useRef<number | null>(null);
 
   // Contact form
   const [form, setForm] = useState({ name: "", email: "", mobile: "", message: "" });
@@ -101,10 +101,6 @@ export default function HomePage() {
   const [forumInput, setForumInput] = useState({ name: "", message: "" });
 
   useEffect(() => {
-    // api.siteStats().then(setStats).catch(() => {});
-    api.getGallery().then((data: GalleryItem[]) => {
-      if (data?.length) setGallery(data.map((g) => ({ url: g.image_url, title: g.title })));
-    }).catch(() => {});
     api.getEvents().then((data: EventItem[]) => {
       if (data?.length) setEvents(data);
     }).catch(() => {});
@@ -112,18 +108,6 @@ export default function HomePage() {
       if (data?.length) setForumPosts(data);
     }).catch(() => {});
   }, []);
-
-  // Autoplay carousel
-  useEffect(() => {
-    if (!galleryApi) return;
-    autoplayRef.current = window.setInterval(() => {
-      if (galleryApi.canScrollNext()) galleryApi.scrollNext();
-      else galleryApi.scrollTo(0);
-    }, 3000);
-    return () => {
-      if (autoplayRef.current) window.clearInterval(autoplayRef.current);
-    };
-  }, [galleryApi]);
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -450,41 +434,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Gallery Carousel */}
+      {/* Static Gallery Grid */}
       <section id="gallery" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
             <p className="text-sm font-semibold text-orange-500 mb-2 flex items-center justify-center gap-2">
               <ImageIcon size={16} /> Our Gallery
             </p>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Moments from Our Community</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Memories from Events and Community Gatherings</h2>
           </div>
-          <Carousel setApi={setGalleryApi} opts={{ loop: true, align: "start" }} className="px-10">
-            <CarouselContent>
-              {gallery.map((g, i) => (
-                <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/3">
-                  <button
-                    type="button"
-                    onClick={() => setPreview({ url: g.url, title: g.title })}
-                    className="rounded-xl overflow-hidden shadow-md group relative aspect-[4/3] block w-full text-left focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <img src={g.url} alt={g.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <p className="text-white text-sm font-medium">{g.title}</p>
-                    </div>
-                  </button>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-          <div className="text-center mt-8">
-            <Link to="/gallery">
-              <Button variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
-                View Full Gallery <ArrowRight size={14} className="ml-1" />
-              </Button>
-            </Link>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {defaultGallery.map((g, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setPreview({ url: g.url, title: g.title })}
+                className={`rounded-xl overflow-hidden shadow-md group relative aspect-[4/3] block w-full text-left focus:outline-none focus:ring-2 focus:ring-orange-500 ${i === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
+              >
+                <img
+                  src={g.url}
+                  alt={g.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-white text-sm font-medium">{g.title}</p>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -500,7 +477,7 @@ export default function HomePage() {
                 >
                   <X size={16} />
                 </button>
-                <img src={preview.url} alt={preview.title} className="w-full max-h-[70vh] object-contain bg-black" />
+                <img src={preview.url} alt={preview.title} className="w-full max-h-[70vh] object-contain bg-black" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
                 <div className="p-4">
                   <h3 className="font-semibold text-foreground">{preview.title}</h3>
                 </div>
