@@ -612,6 +612,38 @@ export default function HomePage() {
       </section>
 
       {/* Footer with compact contact form */}
+      {/* Find Us - Google Maps */}
+      <section id="location" className="py-16 bg-orange-50/50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <p className="text-sm font-semibold text-orange-500 mb-2 flex items-center justify-center gap-2">
+              <MapPin size={16} /> Visit Us
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Find Us on the Map</h2>
+            <p className="text-sm text-muted-foreground mt-2">417, Vegetarian Village, Puzhal, Chennai – 600066</p>
+          </div>
+          <div className="rounded-xl overflow-hidden shadow-lg border border-border">
+            <iframe
+              title="Goud Bhavan Location"
+              src="https://www.google.com/maps?q=417+Vegetarian+Village+Puzhal+Chennai+600066&output=embed"
+              width="100%"
+              height="420"
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+          <div className="text-center mt-5">
+            <a href="https://maps.app.goo.gl/YMAZ1QJmJPgsqqgf6" target="_blank" rel="noreferrer">
+              <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+                <MapPin size={14} className="mr-1" /> Open in Google Maps
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <footer id="contact" className="bg-foreground text-white/80 py-12">
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
