@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter, Shield, MessageSquare, CheckCircle2, Image as ImageIcon, BedDouble, UtensilsCrossed, Building2, Sparkles, GraduationCap, Stethoscope, HandHeart, Network, ShieldCheck, Accessibility, Car, Camera, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X } from "lucide-react";
