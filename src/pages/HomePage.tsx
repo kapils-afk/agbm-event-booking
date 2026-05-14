@@ -47,16 +47,16 @@ const defaultStats: SiteStats = {
 };
 
 const defaultGallery = [
-  { url: "http://goudbhavan.com/assets/1-CPPJ8Vs9.JPG", title: "Community Gathering" },
-  { url: "http://goudbhavan.com/assets/2-B3LUFEx8.JPG", title: "Cultural Celebration" },
-  { url: "http://goudbhavan.com/assets/3-DnBropyF.JPG", title: "Festival Rituals" },
-  { url: "http://goudbhavan.com/assets/4-B50m4U0n.JPG", title: "Wedding Ceremony" },
-  { url: "http://goudbhavan.com/assets/5-CPhCl0GL.JPG", title: "Annual Meet" },
-  { url: "http://goudbhavan.com/assets/6-IRI1mXHA.JPG", title: "Traditional Music" },
-  { url: "http://goudbhavan.com/assets/7-DEjf8GXt.JPG", title: "Community Event" },
-  { url: "http://goudbhavan.com/assets/8-idYN5Hgi.JPG", title: "Bhavan Gathering" },
-  { url: "http://goudbhavan.com/assets/9-DWxZn2WJ.JPG", title: "Cultural Program" },
-  { url: "http://goudbhavan.com/assets/10-DRbXsTnY.jpg", title: "Community Meet" },
+  { url: "/images/gallery/1.jpg", title: "Community Gathering" },
+  { url: "/images/gallery/2.jpg", title: "Cultural Celebration" },
+  { url: "/images/gallery/3.jpg", title: "Festival Rituals" },
+  { url: "/images/gallery/4.jpg", title: "Wedding Ceremony" },
+  { url: "/images/gallery/5.jpg", title: "Annual Meet" },
+  { url: "/images/gallery/6.jpg", title: "Traditional Music" },
+  { url: "/images/gallery/7.jpg", title: "Community Event" },
+  { url: "/images/gallery/8.jpg", title: "Bhavan Gathering" },
+  { url: "/images/gallery/9.jpg", title: "Cultural Program" },
+  { url: "/images/gallery/10.jpg", title: "Community Meet" },
 ];
 
 const defaultEvents: EventItem[] = [
