@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter, Shield, MessageSquare, CheckCircle2, Image as ImageIcon } from "lucide-react";
+import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter, Shield, MessageSquare, CheckCircle2, Image as ImageIcon, BedDouble, UtensilsCrossed, Building2, Sparkles, GraduationCap, Stethoscope, HandHeart, Network, ShieldCheck, Accessibility, Car, Camera, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MemberLoginDialog from "@/components/MemberLoginDialog";
 import { api } from "@/lib/api";
@@ -172,9 +172,11 @@ export default function HomePage() {
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a href="#home" className="hover:text-foreground transition-colors">Home</a>
             <a href="#about" className="hover:text-foreground transition-colors">About</a>
+            <a href="#focus" className="hover:text-foreground transition-colors">Focus Areas</a>
+            <a href="#facilities" className="hover:text-foreground transition-colors">Facilities</a>
+            <a href="#team" className="hover:text-foreground transition-colors">Team</a>
             <a href="#gallery" className="hover:text-foreground transition-colors">Gallery</a>
             <a href="#events" className="hover:text-foreground transition-colors">Events</a>
-            <a href="#forum" className="hover:text-foreground transition-colors">Forum</a>
             <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
@@ -249,6 +251,202 @@ export default function HomePage() {
           <div className="rounded-xl overflow-hidden shadow-lg">
             <img src="/images/agbm-building.png" alt="Chhabil Das Gulab Rai Goud Bhavan Chennai" className="w-full h-auto object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
           </div>
+        </div>
+      </section>
+
+      {/* Leadership Quick Contacts */}
+      <section className="py-12 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <p className="text-sm font-semibold text-orange-500 mb-2">Reach Our Leadership</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Contact Our Office Bearers</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              { role: "President", name: "Sri Manmohan Ji Joshi", phone: "+919444903780" },
+              { role: "Secretary", name: "Sri Nirmal Ji Goud", phone: "+919444077615" },
+              { role: "Ladies Wing Chairperson", name: "Smt. Sharda Sharma Ji", phone: "+919380630202" },
+            ].map((p) => (
+              <Card key={p.role} className="p-5 text-center hover:shadow-lg transition-shadow">
+                <div className="mx-auto w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center mb-3">
+                  <User className="text-orange-500" size={26} />
+                </div>
+                <p className="text-xs font-semibold text-orange-500 uppercase tracking-wide">{p.role}</p>
+                <h3 className="font-bold text-foreground mt-1 mb-3">{p.name}</h3>
+                <div className="flex items-center justify-center gap-2">
+                  <a href={`tel:${p.phone}`}>
+                    <Button size="sm" variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
+                      <Phone size={12} className="mr-1" /> Call
+                    </Button>
+                  </a>
+                  <a href={`https://wa.me/${p.phone.replace("+", "")}`} target="_blank" rel="noreferrer">
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                      <MessageSquare size={12} className="mr-1" /> WhatsApp
+                    </Button>
+                  </a>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Focus Areas - Charitable Trust */}
+      <section id="focus" className="py-16 bg-orange-50/50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold text-orange-500 mb-2">Adi Goud Brahmin Charitable Trust · Estd. 2015</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Our Focus Areas</h2>
+            <p className="text-sm text-muted-foreground mt-2 max-w-2xl mx-auto">Promoting education, health, and cultural development for the welfare of our community.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { icon: GraduationCap, title: "Educational Scholarships", desc: "Supporting students through financial assistance and merit awards." },
+              { icon: Stethoscope, title: "Health Camps & Medical Support", desc: "Organizing health camps and providing medical assistance to families." },
+              { icon: Sparkles, title: "Cultural Preservation", desc: "Preserving and promoting our rich cultural heritage and traditions." },
+              { icon: HandHeart, title: "Social Welfare Programs", desc: "Implementing programs for the betterment of community members." },
+              { icon: Network, title: "Community Development", desc: "Fostering growth and development across all community sectors." },
+              { icon: Building2, title: "Goud Bhavan Management", desc: "Managing and maintaining facilities for community events and gatherings." },
+            ].map((f) => (
+              <Card key={f.title} className="p-5 hover:shadow-lg transition-shadow">
+                <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mb-3">
+                  <f.icon className="text-white" size={22} />
+                </div>
+                <h3 className="font-bold text-foreground mb-1">{f.title}</h3>
+                <p className="text-sm text-muted-foreground">{f.desc}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Ladies Wing */}
+      <section id="ladies-wing" className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold text-orange-500 mb-2">Empowering Women of the Community</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Ladies Wing</h2>
+            <p className="text-sm text-muted-foreground mt-3 max-w-3xl mx-auto">
+              Formed by over 150 women members, the Ladies Wing promotes empowerment through education, wellness, and cultural activities — fostering a supportive and thriving community.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { icon: Sparkles, title: "Cultural Programs", desc: "Traditional events and celebrations" },
+              { icon: GraduationCap, title: "Skill Development", desc: "Workshops and training programs" },
+              { icon: Heart, title: "Health & Wellness", desc: "Fitness and wellness initiatives" },
+              { icon: HandHeart, title: "Women Support", desc: "Helping underprivileged women" },
+            ].map((f) => (
+              <Card key={f.title} className="p-5 text-center hover:shadow-lg transition-shadow bg-gradient-to-br from-pink-50 to-orange-50 border-pink-200">
+                <div className="mx-auto w-12 h-12 rounded-full bg-white flex items-center justify-center mb-3 shadow-sm">
+                  <f.icon className="text-pink-500" size={22} />
+                </div>
+                <h3 className="font-bold text-foreground text-sm mb-1">{f.title}</h3>
+                <p className="text-xs text-muted-foreground">{f.desc}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Facilities at Goud Bhavan */}
+      <section id="facilities" className="py-16 bg-orange-50/50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold text-orange-500 mb-2 flex items-center justify-center gap-2">
+              <Building2 size={16} /> Facilities
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Facilities at Goud Bhavan</h2>
+          </div>
+
+          <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2"><BedDouble className="text-orange-500" size={20} /> Accommodation</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+            {[
+              { title: "12 A/C Standard Double Rooms", desc: "Attached bathrooms with geysers for your comfort" },
+              { title: "2 A/C Deluxe Double Rooms", desc: "Premium rooms with balcony, sofa, and geysers" },
+            ].map((r) => (
+              <Card key={r.title} className="p-5 hover:shadow-lg transition-shadow">
+                <h4 className="font-bold text-foreground mb-1">{r.title}</h4>
+                <p className="text-sm text-muted-foreground">{r.desc}</p>
+              </Card>
+            ))}
+          </div>
+
+          <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2"><UtensilsCrossed className="text-orange-500" size={20} /> Event Spaces</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            {[
+              { title: "Mini Party Hall", cap: "100–150 guests", extra: "Includes pantry facilities" },
+              { title: "Party Hall", cap: "150–250 guests", extra: "Includes kitchen facilities" },
+              { title: "Wedding Hall", cap: "400–500 guests", extra: "Bride & groom rooms included" },
+              { title: "Open Terrace", cap: "200–250 guests", extra: "Customizable décor options" },
+            ].map((s) => (
+              <Card key={s.title} className="p-5 hover:shadow-lg transition-shadow border-l-4 border-l-orange-500">
+                <h4 className="font-bold text-foreground mb-1">{s.title}</h4>
+                <p className="text-sm text-orange-600 font-semibold">{s.cap}</p>
+                <p className="text-xs text-muted-foreground mt-1">{s.extra}</p>
+              </Card>
+            ))}
+          </div>
+
+          <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2"><ShieldCheck className="text-orange-500" size={20} /> Amenities</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { icon: Camera, label: "CCTV & 24×7 Security" },
+              { icon: Accessibility, label: "Lift & Wheelchair Access" },
+              { icon: Stethoscope, label: "Doctor on Call" },
+              { icon: Car, label: "Ample Parking" },
+              { icon: User, label: "Reception & Printer" },
+              { icon: ShieldCheck, label: "Safe & Secure" },
+            ].map((a) => (
+              <div key={a.label} className="bg-white rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow">
+                <a.icon className="text-orange-500 mx-auto mb-1" size={20} />
+                <p className="text-xs font-medium text-foreground">{a.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Management Team */}
+      <section id="team" className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold text-orange-500 mb-2">Our Management Team</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Dedicated Leaders Serving Our Community</h2>
+            <p className="text-sm text-muted-foreground mt-2">Committed to serving with integrity and vision</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            {[
+              { role: "Chairman", name: "Shri Vishwanath Ji Sharma", phone: "+919952995768" },
+              { role: "Vice Chairman", name: "Shri Maniram Ji Sharma", phone: "+919380750282" },
+              { role: "Vice Chairman", name: "Shri Maliram Ji Sharma", phone: "+919840682066" },
+              { role: "Managing Trustee", name: "Shri Suresh Ji Attri", phone: "+919841011251" },
+              { role: "Secretary", name: "Shri Deepak Ji Sharma", phone: "+919444412706" },
+              { role: "Joint Secretary", name: "Shri Amit Ji Sharma", phone: "+919884362592" },
+              { role: "Treasurer", name: "Shri Anil Kumar Ji Sharma", phone: "+919382180277" },
+              { role: "Joint Treasurer", name: "Shri Prashanth Ji Sharma", phone: "+919841734650" },
+              { role: "Bhavan Manager", name: "Bhavan Office", phone: "+917603951126" },
+            ].map((m) => (
+              <Card key={m.role + m.name} className="p-5 text-center hover:shadow-lg transition-shadow">
+                <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center mb-3">
+                  <User className="text-white" size={28} />
+                </div>
+                <p className="text-xs font-semibold text-orange-500 uppercase tracking-wide">{m.role}</p>
+                <h3 className="font-bold text-foreground mt-1 text-sm mb-3">{m.name}</h3>
+                <div className="flex items-center justify-center gap-3">
+                  <a href={`tel:${m.phone}`} className="text-orange-600 hover:text-orange-700" aria-label="Call">
+                    <Phone size={16} />
+                  </a>
+                  <a href={`https://wa.me/${m.phone.replace("+", "")}`} target="_blank" rel="noreferrer" className="text-green-600 hover:text-green-700" aria-label="WhatsApp">
+                    <MessageSquare size={16} />
+                  </a>
+                </div>
+              </Card>
+            ))}
+          </div>
+          <p className="text-center text-sm text-muted-foreground mt-8">
+            For general enquiries: <a href="tel:+917603951126" className="text-orange-600 font-semibold">+91 76039 51126</a>
+          </p>
         </div>
       </section>
 
@@ -414,6 +612,38 @@ export default function HomePage() {
       </section>
 
       {/* Footer with compact contact form */}
+      {/* Find Us - Google Maps */}
+      <section id="location" className="py-16 bg-orange-50/50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <p className="text-sm font-semibold text-orange-500 mb-2 flex items-center justify-center gap-2">
+              <MapPin size={16} /> Visit Us
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Find Us on the Map</h2>
+            <p className="text-sm text-muted-foreground mt-2">417, Vegetarian Village, Puzhal, Chennai – 600066</p>
+          </div>
+          <div className="rounded-xl overflow-hidden shadow-lg border border-border">
+            <iframe
+              title="Goud Bhavan Location"
+              src="https://www.google.com/maps?q=417+Vegetarian+Village+Puzhal+Chennai+600066&output=embed"
+              width="100%"
+              height="420"
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+          <div className="text-center mt-5">
+            <a href="https://maps.app.goo.gl/YMAZ1QJmJPgsqqgf6" target="_blank" rel="noreferrer">
+              <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+                <MapPin size={14} className="mr-1" /> Open in Google Maps
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <footer id="contact" className="bg-foreground text-white/80 py-12">
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
@@ -431,9 +661,9 @@ export default function HomePage() {
           <div>
             <h3 className="font-semibold text-white text-sm mb-3">Contact Us</h3>
             <div className="space-y-2 text-xs">
-              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" /><span>417, Vegetarian Village, Puzhal, Chennai, Tamil Nadu 600060</span></div>
-              <div className="flex items-center gap-2"><Phone size={14} className="shrink-0 text-orange-400" /><span>+91 7603951126, +91 9444412706</span></div>
-              <div className="flex items-center gap-2"><Mail size={14} className="shrink-0 text-orange-400" /><span>adigoudtrust@gmail.com</span></div>
+              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" /><a href="https://maps.app.goo.gl/YMAZ1QJmJPgsqqgf6" target="_blank" rel="noreferrer" className="hover:text-orange-300">417, Vegetarian Village, Puzhal, Chennai – 600066</a></div>
+              <div className="flex items-center gap-2"><Phone size={14} className="shrink-0 text-orange-400" /><a href="tel:+917603951126" className="hover:text-orange-300">+91 76039 51126</a>, <a href="tel:+919444077615" className="hover:text-orange-300">+91 94440 77615</a></div>
+              <div className="flex items-center gap-2"><Mail size={14} className="shrink-0 text-orange-400" /><a href="mailto:enquiry@goudbhavan.com" className="hover:text-orange-300">enquiry@goudbhavan.com</a></div>
             </div>
           </div>
 
