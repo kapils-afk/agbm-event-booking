@@ -629,9 +629,9 @@ export default function HomePage() {
           <div>
             <h3 className="font-semibold text-white text-sm mb-3">Contact Us</h3>
             <div className="space-y-2 text-xs">
-              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" /><span>417, Vegetarian Village, Puzhal, Chennai, Tamil Nadu 600060</span></div>
-              <div className="flex items-center gap-2"><Phone size={14} className="shrink-0 text-orange-400" /><span>+91 7603951126, +91 9444412706</span></div>
-              <div className="flex items-center gap-2"><Mail size={14} className="shrink-0 text-orange-400" /><span>adigoudtrust@gmail.com</span></div>
+              <div className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0 text-orange-400" /><a href="https://maps.app.goo.gl/YMAZ1QJmJPgsqqgf6" target="_blank" rel="noreferrer" className="hover:text-orange-300">417, Vegetarian Village, Puzhal, Chennai – 600066</a></div>
+              <div className="flex items-center gap-2"><Phone size={14} className="shrink-0 text-orange-400" /><a href="tel:+917603951126" className="hover:text-orange-300">+91 76039 51126</a>, <a href="tel:+919444077615" className="hover:text-orange-300">+91 94440 77615</a></div>
+              <div className="flex items-center gap-2"><Mail size={14} className="shrink-0 text-orange-400" /><a href="mailto:enquiry@goudbhavan.com" className="hover:text-orange-300">enquiry@goudbhavan.com</a></div>
             </div>
           </div>
 
