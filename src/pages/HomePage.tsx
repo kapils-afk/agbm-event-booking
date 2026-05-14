@@ -172,9 +172,11 @@ export default function HomePage() {
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a href="#home" className="hover:text-foreground transition-colors">Home</a>
             <a href="#about" className="hover:text-foreground transition-colors">About</a>
+            <a href="#focus" className="hover:text-foreground transition-colors">Focus Areas</a>
+            <a href="#facilities" className="hover:text-foreground transition-colors">Facilities</a>
+            <a href="#team" className="hover:text-foreground transition-colors">Team</a>
             <a href="#gallery" className="hover:text-foreground transition-colors">Gallery</a>
             <a href="#events" className="hover:text-foreground transition-colors">Events</a>
-            <a href="#forum" className="hover:text-foreground transition-colors">Forum</a>
             <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
