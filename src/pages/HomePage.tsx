@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter, Shield, MessageSquare, CheckCircle2, Image as ImageIcon } from "lucide-react";
+import { Users, CalendarDays, Heart, MapPin, Phone, Mail, ArrowRight, Facebook, Instagram, Twitter, Shield, MessageSquare, CheckCircle2, Image as ImageIcon, BedDouble, UtensilsCrossed, Building2, Sparkles, GraduationCap, Stethoscope, HandHeart, Network, ShieldCheck, Accessibility, Car, Camera, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MemberLoginDialog from "@/components/MemberLoginDialog";
 import { api } from "@/lib/api";
