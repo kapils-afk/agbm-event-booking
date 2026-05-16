@@ -64,6 +64,8 @@ function toApiPayload(booking: Booking) {
     regular_rooms: booking.regularRooms ?? null,
     deluxe_rooms: booking.deluxeRooms ?? null,
     utility_charges: booking.utilityCharges,
+    utility_items: booking.utilityItems ?? decodeExtras(booking.purposeDescription).utilities,
+    advance_items: booking.advanceItems ?? decodeExtras(booking.purposeDescription).advances,
     receipt_number: booking.receiptNumber,
     booking_date: booking.bookingDate,
     terms_accepted: booking.termsAccepted,
