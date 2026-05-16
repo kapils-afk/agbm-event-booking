@@ -205,6 +205,7 @@ export default function HomePage() {
             <a href="#team" className="hover:text-foreground transition-colors">Team</a>
             <a href="#gallery" className="hover:text-foreground transition-colors">Gallery</a>
             <a href="#events" className="hover:text-foreground transition-colors">Events</a>
+            <a href="#enquiry" className="hover:text-foreground transition-colors">Booking Enquiry</a>
             <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
