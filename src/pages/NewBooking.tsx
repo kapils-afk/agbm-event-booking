@@ -155,6 +155,8 @@ export default function NewBooking() {
         regularRooms: halls.includes("Rooms") && Number(regularRooms) > 0 ? Number(regularRooms) : undefined,
         deluxeRooms: halls.includes("Rooms") && Number(deluxeRooms) > 0 ? Number(deluxeRooms) : undefined,
         utilityCharges: tariffAmount,
+        utilityItems,
+        advanceItems,
         receiptNumber: form.receiptNumber,
         bookingDate: form.bookingDate,
         termsAccepted: form.termsAccepted,
