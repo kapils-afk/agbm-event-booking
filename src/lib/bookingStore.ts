@@ -1,6 +1,9 @@
 import { api } from "./api";
+import { decodeExtras, type UtilityItem, type AdvanceItem } from "./bookingExtras";
 
 export interface Booking {
+  utilityItems?: UtilityItem[];
+  advanceItems?: AdvanceItem[];
   id: string;
   name: string;
   address: string;
