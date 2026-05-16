@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { X, CheckCircle, Send } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface SiteStats {
@@ -100,6 +101,49 @@ export default function HomePage() {
   const [forumPosts, setForumPosts] = useState<ForumPost[]>([]);
   const [forumInput, setForumInput] = useState({ name: "", message: "" });
 
+  // Booking enquiry form (matches reference site)
+  const [bookingForm, setBookingForm] = useState({ name: "", mobile: "", email: "", visitDate: "", option: "", message: "" });
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [bookingSubmitted, setBookingSubmitted] = useState(false);
+
+  const bookingOptions = [
+    "One Room",
+    "Multiple Rooms",
+    "All Rooms",
+    "All Rooms with Mini Hall",
+    "All Rooms with Mini Hall and Dining",
+    "All Rooms with Mini Hall, Dining & Kitchen",
+    "Main Hall",
+    "Dining Hall",
+    "Dining Hall with Kitchen",
+    "Main Hall with Dining",
+    "Full Bhavan",
+  ];
+
+  const handleBookingEnquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookingForm.name.trim() || !bookingForm.mobile.trim() || !bookingForm.email.trim() || !bookingForm.visitDate || !bookingForm.option) {
+      toast({ title: "Please fill all required fields", variant: "destructive" });
+      return;
+    }
+    setBookingSubmitting(true);
+    try {
+      const composed = `Booking Enquiry\nOption: ${bookingForm.option}\nDate of Visit: ${bookingForm.visitDate}\n\n${bookingForm.message || "(no additional message)"}`;
+      await api.submitEnquiry({
+        name: bookingForm.name,
+        email: bookingForm.email,
+        mobile: bookingForm.mobile,
+        message: composed,
+      });
+      setBookingSubmitted(true);
+      setBookingForm({ name: "", mobile: "", email: "", visitDate: "", option: "", message: "" });
+    } catch {
+      toast({ title: "Failed to send enquiry. Please try again.", variant: "destructive" });
+    } finally {
+      setBookingSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     api.getEvents().then((data: EventItem[]) => {
       if (data?.length) setEvents(data);
@@ -161,6 +205,7 @@ export default function HomePage() {
             <a href="#team" className="hover:text-foreground transition-colors">Team</a>
             <a href="#gallery" className="hover:text-foreground transition-colors">Gallery</a>
             <a href="#events" className="hover:text-foreground transition-colors">Events</a>
+            <a href="#enquiry" className="hover:text-foreground transition-colors">Booking Enquiry</a>
             <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
@@ -589,6 +634,100 @@ export default function HomePage() {
       </section>
 
       {/* Footer with compact contact form */}
+      {/* Booking Enquiry */}
+      <section id="enquiry" className="py-16 bg-gradient-to-br from-orange-50 via-white to-red-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold text-orange-500 mb-2 flex items-center justify-center gap-2">
+              <Send size={16} /> Booking Enquiry
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Send an Enquiry for Booking Goud Bhavan</h2>
+            <p className="text-sm text-muted-foreground mt-2 max-w-2xl mx-auto">Choose from the following options to send your enquiry. Our team will respond within 24 hours.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Left: Image + options */}
+            <div className="space-y-5">
+              <div className="rounded-xl overflow-hidden shadow-lg">
+                <img src="/images/agbm-building.png" alt="Goud Bhavan" className="w-full h-64 object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
+              </div>
+              <Card className="p-5 bg-white">
+                <h3 className="font-bold text-foreground mb-3">Available Booking Options</h3>
+                <ul className="space-y-2 text-sm">
+                  {[
+                    "Single or Multiple Room Booking",
+                    "Complete Bhavan with All Facilities",
+                    "Hall Booking with Dining & Kitchen",
+                    "Customizable Packages Available",
+                  ].map((o) => (
+                    <li key={o} className="flex items-start gap-2 text-muted-foreground">
+                      <CheckCircle size={16} className="text-green-600 mt-0.5 shrink-0" />
+                      <span>{o}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
+
+            {/* Right: Enquiry form */}
+            <Card className="p-6 bg-white">
+              {bookingSubmitted ? (
+                <div className="text-center py-10">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mb-3">
+                    <CheckCircle2 className="text-green-600" size={28} />
+                  </div>
+                  <h3 className="font-bold text-foreground mb-1">Enquiry Sent!</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Our team will contact you within 24 hours.</p>
+                  <Button variant="outline" onClick={() => setBookingSubmitted(false)} className="border-orange-500 text-orange-600 hover:bg-orange-50">
+                    Send another enquiry
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleBookingEnquiry} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-foreground mb-1 block">Full Name *</label>
+                      <Input value={bookingForm.name} onChange={(e) => setBookingForm({ ...bookingForm, name: e.target.value })} maxLength={100} required />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-foreground mb-1 block">Mobile Number *</label>
+                      <Input value={bookingForm.mobile} onChange={(e) => setBookingForm({ ...bookingForm, mobile: e.target.value })} maxLength={20} required />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-foreground mb-1 block">Email Address *</label>
+                      <Input type="email" value={bookingForm.email} onChange={(e) => setBookingForm({ ...bookingForm, email: e.target.value })} maxLength={255} required />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-foreground mb-1 block">Date of Visit / Event *</label>
+                      <Input type="date" value={bookingForm.visitDate} onChange={(e) => setBookingForm({ ...bookingForm, visitDate: e.target.value })} required />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-foreground mb-1 block">Select Booking Option *</label>
+                    <Select value={bookingForm.option} onValueChange={(v) => setBookingForm({ ...bookingForm, option: v })}>
+                      <SelectTrigger><SelectValue placeholder="Choose a booking option" /></SelectTrigger>
+                      <SelectContent>
+                        {bookingOptions.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-foreground mb-1 block">Additional Message</label>
+                    <Textarea value={bookingForm.message} onChange={(e) => setBookingForm({ ...bookingForm, message: e.target.value })} rows={4} maxLength={1000} placeholder="Tell us more about your requirements..." />
+                  </div>
+                  <Button type="submit" disabled={bookingSubmitting} className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+                    <Send size={14} className="mr-1" /> {bookingSubmitting ? "Sending..." : "Send Enquiry"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">This is an enquiry form only. Our team will confirm availability via call or email.</p>
+                </form>
+              )}
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Find Us - Google Maps */}
       <section id="location" className="py-16 bg-orange-50/50">
         <div className="max-w-6xl mx-auto px-4">
