@@ -101,6 +101,49 @@ export default function HomePage() {
   const [forumPosts, setForumPosts] = useState<ForumPost[]>([]);
   const [forumInput, setForumInput] = useState({ name: "", message: "" });
 
+  // Booking enquiry form (matches reference site)
+  const [bookingForm, setBookingForm] = useState({ name: "", mobile: "", email: "", visitDate: "", option: "", message: "" });
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [bookingSubmitted, setBookingSubmitted] = useState(false);
+
+  const bookingOptions = [
+    "One Room",
+    "Multiple Rooms",
+    "All Rooms",
+    "All Rooms with Mini Hall",
+    "All Rooms with Mini Hall and Dining",
+    "All Rooms with Mini Hall, Dining & Kitchen",
+    "Main Hall",
+    "Dining Hall",
+    "Dining Hall with Kitchen",
+    "Main Hall with Dining",
+    "Full Bhavan",
+  ];
+
+  const handleBookingEnquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookingForm.name.trim() || !bookingForm.mobile.trim() || !bookingForm.email.trim() || !bookingForm.visitDate || !bookingForm.option) {
+      toast({ title: "Please fill all required fields", variant: "destructive" });
+      return;
+    }
+    setBookingSubmitting(true);
+    try {
+      const composed = `Booking Enquiry\nOption: ${bookingForm.option}\nDate of Visit: ${bookingForm.visitDate}\n\n${bookingForm.message || "(no additional message)"}`;
+      await api.submitEnquiry({
+        name: bookingForm.name,
+        email: bookingForm.email,
+        mobile: bookingForm.mobile,
+        message: composed,
+      });
+      setBookingSubmitted(true);
+      setBookingForm({ name: "", mobile: "", email: "", visitDate: "", option: "", message: "" });
+    } catch {
+      toast({ title: "Failed to send enquiry. Please try again.", variant: "destructive" });
+    } finally {
+      setBookingSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     api.getEvents().then((data: EventItem[]) => {
       if (data?.length) setEvents(data);
