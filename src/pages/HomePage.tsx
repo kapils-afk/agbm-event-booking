@@ -204,14 +204,10 @@ export default function HomePage() {
             <a href="#facilities" className="hover:text-foreground transition-colors">Facilities</a>
             <a href="#team" className="hover:text-foreground transition-colors">Team</a>
             <a href="#gallery" className="hover:text-foreground transition-colors">Gallery</a>
-            <a href="#events" className="hover:text-foreground transition-colors">Events</a>
             <a href="#enquiry" className="hover:text-foreground transition-colors">Booking Enquiry</a>
             <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => setMemberLoginOpen(true)} className="border-orange-500 text-orange-600 hover:bg-orange-50">
-              <Users size={14} className="mr-1" /> Member Login
-            </Button>
             <Link to="/admin/login">
               <Button size="sm" variant="outline">
                 <Shield size={14} className="mr-1" /> Admin
@@ -220,11 +216,16 @@ export default function HomePage() {
           </div>
         </div>
       </header>
-      <MemberLoginDialog open={memberLoginOpen} onOpenChange={setMemberLoginOpen} />
 
       {/* Hero */}
-      <section id="home" className="relative bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white">
-        <div className="max-w-4xl mx-auto text-center px-4 py-20 md:py-28">
+      <section id="home" className="relative bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-center bg-cover opacity-20 mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: "url('/images/gallery/1.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
+        <div className="relative max-w-4xl mx-auto text-center px-4 py-20 md:py-28">
           <div className="mx-auto w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center mb-6">
             <img src="/images/agbm-logo.png" alt="AGBM Logo" className="w-12 h-12 rounded-full object-cover" />
           </div>
@@ -233,9 +234,9 @@ export default function HomePage() {
             Uniting our community through tradition, culture, and shared values. Together we celebrate our heritage and build a stronger future for generations to come.
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
-            <a href="#events">
+            <a href="#enquiry">
               <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 bg-transparent">
-                Upcoming Events <ArrowRight size={14} className="ml-1" />
+                Booking Enquiry <ArrowRight size={14} className="ml-1" />
               </Button>
             </a>
             <a href="#contact">
@@ -530,43 +531,6 @@ export default function HomePage() {
             )}
           </DialogContent>
         </Dialog>
-      </section>
-
-      {/* Events Section */}
-      <section id="events" className="py-16 bg-orange-50/50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <p className="text-sm font-semibold text-orange-500 mb-2 flex items-center justify-center gap-2">
-              <CalendarDays size={16} /> Events
-            </p>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Upcoming & Recent Events</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.slice(0, 6).map((ev, i) => (
-              <Card key={ev.id} className="overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="aspect-video overflow-hidden bg-muted">
-                  <img
-                    src={ev.image_url || ""}
-                    alt={ev.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-5">
-                  <p className="text-xs text-orange-500 font-semibold mb-1">
-                    {new Date(ev.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
-                  </p>
-                  <h3 className="font-bold text-foreground mb-2">{ev.title}</h3>
-                  {ev.description && <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{ev.description}</p>}
-                  {ev.venue && (
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin size={12} /> {ev.venue}
-                    </div>
-                  )}
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* Forum Section */}
