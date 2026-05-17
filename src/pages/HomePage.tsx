@@ -269,17 +269,54 @@ export default function HomePage() {
 
       {/* About */}
       <section id="about" className="py-16 bg-orange-50/50">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
             <p className="text-sm font-semibold text-orange-500 mb-2">About Our Community</p>
-            <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-              <p>The Adi Goud Brahmin Mahasabha is a vibrant community organization dedicated to preserving and promoting our rich cultural heritage. For over 25 years, we have been bringing together families across India.</p>
-              <p>Our mission is to foster unity, support educational initiatives, organize cultural events, and provide a platform for community members to connect, collaborate, and grow together.</p>
-              <p>Through various programs, festivals, and social initiatives, we strive to create meaningful experiences that strengthen our bonds and pass on our cherished traditions.</p>
-            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">About Adi Goud Brahman Mahasabha Chennai</h2>
           </div>
-          <div className="rounded-xl overflow-hidden shadow-lg">
-            <img src="/images/agbm-building.png" alt="Chhabil Das Gulab Rai Goud Bhavan Chennai" className="w-full h-auto object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="/images/about-mahasabha.png"
+                alt="Adi Goud Brahman Mahasabha Chennai – Cultural Celebration"
+                className="w-full h-auto object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
+              />
+            </div>
+            <div>
+              <div className="space-y-4 text-sm md:text-base text-muted-foreground leading-relaxed">
+                <p>
+                  Founded in <span className="font-semibold text-foreground">1992</span>, the Mahasabha represents and
+                  supports over <span className="font-semibold text-foreground">400 Adi Goud Brahman families</span> in
+                  Chennai. It focuses on unity, cultural heritage, social welfare, and education.
+                </p>
+                <p>
+                  Through cultural festivals, educational scholarships, health camps, and community engagement, we work
+                  to preserve our traditions while empowering the next generation of our community.
+                </p>
+              </div>
+
+              <div className="mt-6 p-5 rounded-lg bg-white border-l-4 border-orange-500 shadow-sm">
+                <p className="text-xs font-semibold text-orange-500 uppercase tracking-wide mb-1">Our Mission</p>
+                <p className="text-sm md:text-base text-foreground leading-relaxed">
+                  To connect and empower Brahman families through tradition, learning, and service.
+                </p>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { title: "Cultural Events & Festivals", desc: "Celebrating our rich heritage." },
+                  { title: "Educational Scholarships", desc: "Supporting bright students." },
+                  { title: "Health & Social Welfare", desc: "Camps and community support." },
+                  { title: "Networking & Engagement", desc: "Strong member connections." },
+                ].map((f) => (
+                  <div key={f.title} className="p-3 rounded-lg bg-white border border-orange-100">
+                    <p className="text-sm font-semibold text-foreground">{f.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{f.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
