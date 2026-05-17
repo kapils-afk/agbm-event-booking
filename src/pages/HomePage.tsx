@@ -204,14 +204,10 @@ export default function HomePage() {
             <a href="#facilities" className="hover:text-foreground transition-colors">Facilities</a>
             <a href="#team" className="hover:text-foreground transition-colors">Team</a>
             <a href="#gallery" className="hover:text-foreground transition-colors">Gallery</a>
-            <a href="#events" className="hover:text-foreground transition-colors">Events</a>
             <a href="#enquiry" className="hover:text-foreground transition-colors">Booking Enquiry</a>
             <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => setMemberLoginOpen(true)} className="border-orange-500 text-orange-600 hover:bg-orange-50">
-              <Users size={14} className="mr-1" /> Member Login
-            </Button>
             <Link to="/admin/login">
               <Button size="sm" variant="outline">
                 <Shield size={14} className="mr-1" /> Admin
@@ -220,11 +216,16 @@ export default function HomePage() {
           </div>
         </div>
       </header>
-      <MemberLoginDialog open={memberLoginOpen} onOpenChange={setMemberLoginOpen} />
 
       {/* Hero */}
-      <section id="home" className="relative bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white">
-        <div className="max-w-4xl mx-auto text-center px-4 py-20 md:py-28">
+      <section id="home" className="relative bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-center bg-cover opacity-20 mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: "url('/images/gallery/1.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
+        <div className="relative max-w-4xl mx-auto text-center px-4 py-20 md:py-28">
           <div className="mx-auto w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center mb-6">
             <img src="/images/agbm-logo.png" alt="AGBM Logo" className="w-12 h-12 rounded-full object-cover" />
           </div>
