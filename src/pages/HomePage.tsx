@@ -533,43 +533,6 @@ export default function HomePage() {
         </Dialog>
       </section>
 
-      {/* Events Section */}
-      <section id="events" className="py-16 bg-orange-50/50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <p className="text-sm font-semibold text-orange-500 mb-2 flex items-center justify-center gap-2">
-              <CalendarDays size={16} /> Events
-            </p>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Upcoming & Recent Events</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.slice(0, 6).map((ev, i) => (
-              <Card key={ev.id} className="overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="aspect-video overflow-hidden bg-muted">
-                  <img
-                    src={ev.image_url || ""}
-                    alt={ev.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-5">
-                  <p className="text-xs text-orange-500 font-semibold mb-1">
-                    {new Date(ev.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
-                  </p>
-                  <h3 className="font-bold text-foreground mb-2">{ev.title}</h3>
-                  {ev.description && <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{ev.description}</p>}
-                  {ev.venue && (
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin size={12} /> {ev.venue}
-                    </div>
-                  )}
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Forum Section */}
       <section id="forum" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
