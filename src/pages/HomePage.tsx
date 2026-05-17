@@ -234,9 +234,9 @@ export default function HomePage() {
             Uniting our community through tradition, culture, and shared values. Together we celebrate our heritage and build a stronger future for generations to come.
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
-            <a href="#events">
+            <a href="#enquiry">
               <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 bg-transparent">
-                Upcoming Events <ArrowRight size={14} className="ml-1" />
+                Booking Enquiry <ArrowRight size={14} className="ml-1" />
               </Button>
             </a>
             <a href="#contact">
