@@ -73,6 +73,21 @@ function toApiPayload(booking: Booking) {
   };
 }
 
+function normalizeDateTime(value: string | null | undefined): string {
+  return (value || "").replace(" ", "T");
+}
+
+function toBooking(raw: any): Booking {
+  return {
+    ...raw,
+    fromDateTime: normalizeDateTime(raw.fromDateTime ?? raw.from_date_time),
+    toDateTime: normalizeDateTime(raw.toDateTime ?? raw.to_date_time),
+    createdAt: raw.createdAt ?? raw.created_at ?? new Date().toISOString(),
+    utilityItems: raw.utilityItems ?? raw.utility_items,
+    advanceItems: raw.advanceItems ?? raw.advance_items,
+  } as Booking;
+}
+
 // Kept for Dashboard (synchronous reads from cache)
 let _cache: Booking[] = [];
 
@@ -81,14 +96,15 @@ export function getBookings(): Booking[] {
 }
 
 export async function loadBookings(): Promise<Booking[]> {
-  _cache = await api.getBookings();
+  _cache = (await api.getBookings()).map(toBooking);
   return _cache;
 }
 
 export async function saveBooking(booking: Booking): Promise<{ success: boolean; conflict?: Booking }> {
   try {
     const saved = await api.createBooking(toApiPayload(booking));
-    _cache = [..._cache, saved];
+    const normalized = toBooking(saved);
+    _cache = [..._cache, normalized];
     return { success: true };
   } catch (err: any) {
     if (err.status === 409 && err.data?.conflict) {
@@ -101,7 +117,8 @@ export async function saveBooking(booking: Booking): Promise<{ success: boolean;
 export async function updateBooking(booking: Booking): Promise<{ success: boolean; conflict?: Booking }> {
   try {
     const updated = await api.updateBooking(booking.id, toApiPayload(booking));
-    _cache = _cache.map(b => b.id === booking.id ? updated : b);
+    const normalized = toBooking(updated);
+    _cache = _cache.map(b => b.id === booking.id ? normalized : b);
     return { success: true };
   } catch (err: any) {
     if (err.status === 409 && err.data?.conflict) {
