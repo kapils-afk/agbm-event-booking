@@ -103,7 +103,6 @@ export function AdvancePaymentsEditor({ items, onChange, tariff }: AdvancePaymen
             />
             <Input
               type="number"
-              min={0}
               placeholder="Amount (Rs)"
               value={it.amount || ""}
               onChange={e => update(i, { amount: Number(e.target.value) || 0 })}
