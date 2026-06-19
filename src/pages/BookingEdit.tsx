@@ -132,7 +132,7 @@ export default function BookingEdit() {
       }
       if (extras.advances.length > 0) {
         setAdvanceItems(extras.advances);
-      } else if (booking.advancePayment && Number(booking.advancePayment) > 0) {
+      } else if (booking.advancePayment != null && Number(booking.advancePayment) !== 0) {
         setAdvanceItems([{ date: booking.bookingDate || new Date().toISOString().slice(0, 10), amount: Number(booking.advancePayment), note: "" }]);
       }
 
@@ -231,7 +231,7 @@ export default function BookingEdit() {
       name: form.name, address: form.address, occupation: form.occupation,
       phone: form.phone, alternatePhone: form.alternatePhone || undefined,
       proofIdType, proofIdNumber,
-      advancePayment: totalAdvance > 0 ? totalAdvance : undefined,
+      advancePayment: totalAdvance !== 0 ? totalAdvance : undefined,
       tariffAmount: tariffAmount > 0 ? tariffAmount : undefined,
       functionType: form.functionType,
       purposeDescription: purpose || undefined,

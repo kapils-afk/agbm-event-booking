@@ -145,7 +145,7 @@ export default function NewBooking() {
         name: form.name, address: form.address, occupation: form.occupation,
         phone: form.phone, alternatePhone: form.alternatePhone || undefined,
         proofIdType, proofIdNumber,
-        advancePayment: totalAdvance > 0 ? totalAdvance : undefined,
+        advancePayment: totalAdvance !== 0 ? totalAdvance : undefined,
         tariffAmount: tariffAmount > 0 ? tariffAmount : undefined,
         functionType: form.functionType,
         purposeDescription: purpose || undefined,
