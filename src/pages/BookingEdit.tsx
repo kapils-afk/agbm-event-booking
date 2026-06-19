@@ -46,7 +46,8 @@ function getProofIdPlaceholder(type: string) {
 function combineDateTime(date: string, time: string) { return date && time ? `${date}T${time}` : ""; }
 function splitDateTime(dt: string): { date: string; time: string } {
   if (!dt) return { date: "", time: "" };
-  const [date, timeFull = ""] = dt.split("T");
+  const clean = dt.replace(" ", "T");
+  const [date, timeFull = ""] = clean.split("T");
   const time = timeFull.slice(0, 5);
   return { date: date || "", time };
 }
