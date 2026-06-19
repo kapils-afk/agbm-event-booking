@@ -132,7 +132,7 @@ export default function BookingEdit() {
       }
       if (extras.advances.length > 0) {
         setAdvanceItems(extras.advances);
-      } else if (booking.advancePayment && Number(booking.advancePayment) > 0) {
+      } else if (booking.advancePayment != null && Number(booking.advancePayment) !== 0) {
         setAdvanceItems([{ date: booking.bookingDate || new Date().toISOString().slice(0, 10), amount: Number(booking.advancePayment), note: "" }]);
       }
 
