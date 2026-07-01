@@ -140,6 +140,7 @@ export default function BookingManagement() {
                   <TableCell className="text-xs">{format(new Date(b.fromDateTime), "dd/MM/yy hh:mm a")}</TableCell>
                   <TableCell className="text-xs">{format(new Date(b.toDateTime), "dd/MM/yy hh:mm a")}</TableCell>
                   <TableCell>{b.hallType}</TableCell>
+                  <TableCell className="font-medium">{b.tariffAmount != null ? `Rs. ${Number(b.tariffAmount).toLocaleString()}` : "-"}</TableCell>
                   <TableCell><Badge className={`${statusColors[b.status]} border-none text-xs`}>{b.status}</Badge></TableCell>
                   <TableCell>
                     <div className="flex gap-1">
