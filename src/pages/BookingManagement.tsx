@@ -123,6 +123,7 @@ export default function BookingManagement() {
                 <SortHeader field="fromDateTime">From</SortHeader>
                 <SortHeader field="toDateTime">To</SortHeader>
                 <TableHead>Hall</TableHead>
+                <TableHead>Booking Amount</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
