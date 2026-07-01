@@ -123,13 +123,14 @@ export default function BookingManagement() {
                 <SortHeader field="fromDateTime">From</SortHeader>
                 <SortHeader field="toDateTime">To</SortHeader>
                 <TableHead>Hall</TableHead>
+                <TableHead>Booking Amount</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">No bookings found</TableCell></TableRow>
+                <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">No bookings found</TableCell></TableRow>
               ) : filtered.map(b => (
                 <TableRow key={b.id}>
                   <TableCell className="font-mono text-xs">{b.id}</TableCell>
@@ -139,6 +140,7 @@ export default function BookingManagement() {
                   <TableCell className="text-xs">{format(new Date(b.fromDateTime), "dd/MM/yy hh:mm a")}</TableCell>
                   <TableCell className="text-xs">{format(new Date(b.toDateTime), "dd/MM/yy hh:mm a")}</TableCell>
                   <TableCell>{b.hallType}</TableCell>
+                  <TableCell className="font-medium">{b.tariffAmount != null ? `Rs. ${Number(b.tariffAmount).toLocaleString()}` : "-"}</TableCell>
                   <TableCell><Badge className={`${statusColors[b.status]} border-none text-xs`}>{b.status}</Badge></TableCell>
                   <TableCell>
                     <div className="flex gap-1">

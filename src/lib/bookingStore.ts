@@ -85,6 +85,8 @@ function toBooking(raw: any): Booking {
     createdAt: raw.createdAt ?? raw.created_at ?? new Date().toISOString(),
     utilityItems: raw.utilityItems ?? raw.utility_items,
     advanceItems: raw.advanceItems ?? raw.advance_items,
+    tariffAmount: raw.tariffAmount ?? raw.tariff_amount ?? undefined,
+    advancePayment: raw.advancePayment ?? raw.advance_payment ?? undefined,
   } as Booking;
 }
 
