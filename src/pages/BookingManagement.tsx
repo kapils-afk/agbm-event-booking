@@ -130,7 +130,7 @@ export default function BookingManagement() {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">No bookings found</TableCell></TableRow>
+                <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">No bookings found</TableCell></TableRow>
               ) : filtered.map(b => (
                 <TableRow key={b.id}>
                   <TableCell className="font-mono text-xs">{b.id}</TableCell>
