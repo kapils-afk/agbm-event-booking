@@ -12,6 +12,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
+  //testing pull request
+
   return (
     <div className="flex min-h-screen">
       {/* Desktop sidebar */}
